@@ -36,11 +36,13 @@ public class ChangelogMojo extends RedmineMojo {
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
-		final List<Version> versions = this.redmine.getVersions(this.getProjectIdentifier());
-		this.getLog().info("Found versions for project: " + this.getProjectIdentifier());
-		for (final Version v : versions) {
-			this.getLog().info(String.format("  > %s (%s) [%s]", v.getName(), v.getStatus(), v.getUpdated_on().toString()));
+		try {
+			this.changelogFile.getParentFile().mkdirs();
+		} catch (final Exception e) {
+			throw new MojoExecutionException(e.getMessage(), e);
 		}
+
+		final List<Version> versions = this.redmine.getVersions(this.getProjectIdentifier());
 
 		final SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd yyyy");
 		// Sort versions

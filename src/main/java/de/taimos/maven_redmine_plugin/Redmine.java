@@ -9,7 +9,9 @@ import org.apache.http.HttpResponse;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import de.taimos.httputils.HTTPRequest;
 import de.taimos.httputils.WS;
+import de.taimos.httputils.WSConstants;
 import de.taimos.maven_redmine_plugin.model.Ticket;
 import de.taimos.maven_redmine_plugin.model.Version;
 
@@ -94,12 +96,34 @@ public class Redmine {
 	@SuppressWarnings("unchecked")
 	private HashMap<String, Object> getResponseAsMap(final String url) {
 		try {
-			final HttpResponse response = WS.url(this.redmineUrl + url).header("X-Redmine-API-Key", this.redmineKey).get();
+			final HttpResponse response = this.createRequest(url).get();
 			final String responseAsString = WS.getResponseAsString(response);
 			return this.mapper.readValue(responseAsString, HashMap.class);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		return new HashMap<>();
+	}
+
+	private HTTPRequest createRequest(final String url) {
+		return WS.url(this.redmineUrl + url).header("X-Redmine-API-Key", this.redmineKey);
+	}
+
+	/**
+	 * @param version
+	 *            the version to close
+	 */
+	public void closeVersion(final Version version) {
+		try {
+			final String body = String.format("{\"version\":{\"name\":\"%s\",\"status\":\"closed\"}}", version.getName());
+			final HTTPRequest req = this.createRequest("/versions/" + version.getId() + ".json");
+			req.header(WSConstants.HEADER_CONTENT_TYPE, "application/json");
+			final HttpResponse put = req.body(body).put();
+			if (put.getStatusLine().getStatusCode() >= 400) {
+				throw new RuntimeException("Status change failed");
+			}
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
