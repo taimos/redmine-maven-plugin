@@ -24,17 +24,24 @@ public class TicketDeserializer extends JsonDeserializer<Ticket> {
 		final Ticket t = new Ticket();
 		t.setId(json.get("id").getIntValue());
 		t.setSubject(json.get("subject").getTextValue());
-		t.setTracker(json.get("tracker").get("name").getTextValue());
-		t.setAssignee(json.get("assigned_to").get("name").getTextValue());
+		t.setTracker(TicketDeserializer.getNestedName(json, "tracker"));
+		t.setAssignee(TicketDeserializer.getNestedName(json, "assigned_to"));
 		t.setAuthor(json.get("author").get("name").getTextValue());
 		t.setCreated(codec.convertValue(json.get("created_on"), Date.class));
 		t.setStartDate(codec.convertValue(json.get("start_date"), Date.class));
 		t.setUpdated(codec.convertValue(json.get("updated_on"), Date.class));
 		t.setDescription(json.get("description").getTextValue());
-		t.setFixedVersion(json.get("fixed_version").get("name").getTextValue());
-		t.setPriority(json.get("priority").get("name").getTextValue());
-		t.setStatus(json.get("status").get("name").getTextValue());
+		t.setFixedVersion(TicketDeserializer.getNestedName(json, "fixed_version"));
+		t.setPriority(TicketDeserializer.getNestedName(json, "priority"));
+		t.setStatus(TicketDeserializer.getNestedName(json, "status"));
 
 		return t;
+	}
+
+	private static String getNestedName(final JsonNode json, final String field) {
+		if (json.has(field) && json.get(field).has("name")) {
+			return json.get(field).get("name").getTextValue();
+		}
+		return null;
 	}
 }

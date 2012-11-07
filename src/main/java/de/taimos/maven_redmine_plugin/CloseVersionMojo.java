@@ -16,21 +16,25 @@ public class CloseVersionMojo extends RedmineMojo {
 	/**
 	 * Changelog author
 	 * 
-	 * @parameter expression="${version}" default-value="${project.version}"
+	 * @parameter expression="${closeVersion}" default-value="${project.version}"
 	 * @required
 	 */
-	private String version;
+	private String closeVersion;
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
 		final List<Version> versions = this.redmine.getVersions(this.getProjectIdentifier());
 		for (final Version v : versions) {
-			if (v.getName().equals(this.version)) {
+			if (this.checkVersion(v)) {
 				this.redmine.closeVersion(v);
 				return;
 			}
 		}
-		throw new MojoExecutionException(String.format("No version %s found for project %s.", this.version, this.getProjectIdentifier()));
+		throw new MojoExecutionException(String.format("No version %s-%s found for project %s.", this.getProjectVersionPrefix(),
+				Version.cleanSnapshot(this.closeVersion), this.getProjectIdentifier()));
 	}
 
+	private boolean checkVersion(final Version v) {
+		return v.getName().equals(Version.createName(this.getProjectVersionPrefix(), Version.cleanSnapshot(this.closeVersion)));
+	}
 }

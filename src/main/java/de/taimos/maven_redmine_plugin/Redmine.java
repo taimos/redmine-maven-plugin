@@ -126,4 +126,24 @@ public class Redmine {
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * @param project
+	 *            the project identifier
+	 * @param name
+	 *            the version name
+	 */
+	public void createVersion(final String project, final String name) {
+		try {
+			final String body = String.format("{\"version\":{\"name\":\"%s\",\"status\":\"open\"}}", name);
+			final HTTPRequest req = this.createRequest("/projects/" + project + "/versions.json");
+			req.header(WSConstants.HEADER_CONTENT_TYPE, "application/json");
+			final HttpResponse put = req.body(body).post();
+			if (put.getStatusLine().getStatusCode() >= 400) {
+				throw new RuntimeException("Status change failed");
+			}
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

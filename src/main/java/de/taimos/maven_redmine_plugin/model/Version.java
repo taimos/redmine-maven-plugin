@@ -2,6 +2,8 @@ package de.taimos.maven_redmine_plugin.model;
 
 import java.util.Date;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 /**
  * @author hoegertn
  * 
@@ -127,15 +129,55 @@ public class Version implements Comparable<Version> {
 		this.due_date = due_date;
 	}
 
-	@Override
-	public int compareTo(final Version o) {
-		return Version.compareVersions(this.name, o.name);
+	/**
+	 * @return the projectPrefix
+	 */
+	@JsonIgnore
+	public String getProjectPrefix() {
+		final int pos = this.name.indexOf("-");
+		if (pos == -1) {
+			return "";
+		}
+		return this.name.substring(0, pos);
 	}
 
-	private static int compareVersions(final String first, final String second) {
-		final int[] me = Version.splitVersion(first);
-		final int[] other = Version.splitVersion(second);
+	/**
+	 * @return the numeric parts
+	 */
+	@JsonIgnore
+	public int[] getNumericParts() {
+		final int pos = this.name.indexOf("-");
+		if (pos == -1) {
+			return Version.splitVersion(this.name);
+		}
+		return Version.splitVersion(this.name.substring(pos + 1));
+	}
 
+	/**
+	 * @return the version as x.y.z without eventual prefix
+	 */
+	public String toVersionString() {
+		final int pos = this.name.indexOf("-");
+		if (pos == -1) {
+			return this.name;
+		}
+		return this.name.substring(pos + 1);
+	}
+
+	@Override
+	public int compareTo(final Version o) {
+		int comp = this.getProjectPrefix().compareTo(o.getProjectPrefix());
+		if (comp == 0) {
+			comp = Version.compareVersions(this.getNumericParts(), o.getNumericParts());
+		}
+		return comp;
+	}
+
+	private static int compareVersions(final String me, final String other) {
+		return Version.compareVersions(Version.splitVersion(me), Version.splitVersion(other));
+	}
+
+	private static int compareVersions(final int[] me, final int[] other) {
 		if (me[0] == other[0]) {
 			if (me[1] == other[1]) {
 				return me[2] - other[2];
@@ -155,6 +197,26 @@ public class Version implements Comparable<Version> {
 		res[1] = Integer.valueOf(split[1]);
 		res[2] = Integer.valueOf(split[2]);
 		return res;
+	}
+
+	/**
+	 * @param projectPrefix
+	 * @param version
+	 * @return [{projectPrefix}-]{version}
+	 */
+	public static String createName(final String projectPrefix, final String version) {
+		if (projectPrefix != null && !projectPrefix.isEmpty()) {
+			return projectPrefix + "-" + version;
+		}
+		return version;
+	}
+
+	/**
+	 * @param version
+	 * @return the version without -SNAPSHOT
+	 */
+	public static String cleanSnapshot(final String version) {
+		return version.replaceAll("-SNAPSHOT", "");
 	}
 
 	/**

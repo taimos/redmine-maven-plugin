@@ -48,10 +48,22 @@ public abstract class RedmineMojo extends AbstractMojo {
 	 */
 	private String projectIdentifier;
 
+	/**
+	 * Project version prefix.
+	 * 
+	 * @parameter default-value="" expression="${projectVersionPrefix}"
+	 * @required
+	 */
+	private String projectVersionPrefix;
+
 	protected Redmine redmine;
 
 	protected final String getProjectIdentifier() {
 		return this.projectIdentifier;
+	}
+
+	protected String getProjectVersionPrefix() {
+		return this.projectVersionPrefix;
 	}
 
 	private String getRedmineURL() {
