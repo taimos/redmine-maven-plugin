@@ -67,6 +67,10 @@ public class ChangelogMojo extends RedmineMojo {
 			}
 		}
 
+		if (changelogText.length() == 0) {
+			this.getLog().warn("No tickets found for version: " + this.changelogVersion);
+		}
+
 		try (FileWriter fw = new FileWriter(this.changelogFile)) {
 			// write changelog to file
 			fw.write(changelogText.toString());
