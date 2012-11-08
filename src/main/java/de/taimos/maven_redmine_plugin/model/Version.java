@@ -3,6 +3,7 @@ package de.taimos.maven_redmine_plugin.model;
 import java.util.Date;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 
 /**
  * @author hoegertn
@@ -10,6 +11,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
  */
 public class Version implements Comparable<Version> {
 
+	@JsonDeserialize(using = DateDeserializer.class)
 	private Date created_on;
 
 	private String description;
@@ -20,8 +22,10 @@ public class Version implements Comparable<Version> {
 
 	private String status;
 
+	@JsonDeserialize(using = DateDeserializer.class)
 	private Date updated_on;
 
+	@JsonDeserialize(using = DateDeserializer.class)
 	private Date due_date;
 
 	/**
@@ -205,7 +209,7 @@ public class Version implements Comparable<Version> {
 	 * @return [{projectPrefix}-]{version}
 	 */
 	public static String createName(final String projectPrefix, final String version) {
-		if (projectPrefix != null && !projectPrefix.isEmpty()) {
+		if ((projectPrefix != null) && !projectPrefix.isEmpty()) {
 			return projectPrefix + "-" + version;
 		}
 		return version;
