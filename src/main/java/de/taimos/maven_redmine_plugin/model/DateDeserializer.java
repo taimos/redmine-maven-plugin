@@ -18,12 +18,13 @@ import org.codehaus.jackson.map.JsonDeserializer;
 public class DateDeserializer extends JsonDeserializer<Date> {
 
 	@Override
-	public Date deserialize(JsonParser jp, DeserializationContext ctx) throws IOException, JsonProcessingException {
+	public Date deserialize(final JsonParser jp, final DeserializationContext ctx) throws IOException, JsonProcessingException {
 		final String text = jp.getText();
 		return DateDeserializer.parse(text);
 	}
 
 	static Date parse(final String text) throws JsonParseException {
+		// BEWARE THIS IS UGLY CODE STYLE
 		Date parsed = null;
 
 		try {
@@ -36,8 +37,27 @@ public class DateDeserializer extends JsonDeserializer<Date> {
 
 		if (parsed == null) {
 			try {
+				// Redmine 2.x Date only 2012-01-06
+				final SimpleDateFormat newDF = new SimpleDateFormat("yyyy-MM-dd");
+				parsed = newDF.parse(text);
+			} catch (final ParseException e) {
+				// cannot parse date so we try old format
+			}
+		}
+
+		if (parsed == null) {
+			try {
 				// Redmine 1.x 2012/10/09 09:29:19 +0200
 				final SimpleDateFormat oldDF = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
+				parsed = oldDF.parse(text);
+			} catch (final ParseException e) {
+				throw new RuntimeException("Cannot parse date");
+			}
+		}
+		if (parsed == null) {
+			try {
+				// Redmine 1.x Date only 2012/10/09
+				final SimpleDateFormat oldDF = new SimpleDateFormat("yyyy/MM/dd");
 				parsed = oldDF.parse(text);
 			} catch (final ParseException e) {
 				throw new RuntimeException("Cannot parse date");
