@@ -32,7 +32,7 @@ public class DateDeserializer extends JsonDeserializer<Date> {
 			final SimpleDateFormat newDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 			parsed = newDF.parse(text);
 		} catch (final ParseException e) {
-			// cannot parse date so we try old format
+			// cannot parse date so we try other format
 		}
 
 		if (parsed == null) {
@@ -41,7 +41,7 @@ public class DateDeserializer extends JsonDeserializer<Date> {
 				final SimpleDateFormat newDF = new SimpleDateFormat("yyyy-MM-dd");
 				parsed = newDF.parse(text);
 			} catch (final ParseException e) {
-				// cannot parse date so we try old format
+				// cannot parse date so we try other format
 			}
 		}
 
@@ -51,7 +51,7 @@ public class DateDeserializer extends JsonDeserializer<Date> {
 				final SimpleDateFormat oldDF = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
 				parsed = oldDF.parse(text);
 			} catch (final ParseException e) {
-				throw new RuntimeException("Cannot parse date");
+				// cannot parse date so we try other format
 			}
 		}
 		if (parsed == null) {
@@ -60,8 +60,11 @@ public class DateDeserializer extends JsonDeserializer<Date> {
 				final SimpleDateFormat oldDF = new SimpleDateFormat("yyyy/MM/dd");
 				parsed = oldDF.parse(text);
 			} catch (final ParseException e) {
-				throw new RuntimeException("Cannot parse date");
+				// cannot parse date so we try other format
 			}
+		}
+		if (parsed == null) {
+			throw new RuntimeException("Cannot parse date");
 		}
 
 		return parsed;
