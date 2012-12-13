@@ -193,17 +193,22 @@ public class Version implements Comparable<Version> {
 
 	private static int[] splitVersion(final String version) {
 		final String[] split = version.split("\\.");
-		final int[] res = new int[3];
 		if (split.length > 3) {
 			throw new RuntimeException("Illegal version name");
 		}
+		final int[] res = new int[3];
 		switch (split.length) {
-			case 3:
-				res[2] = Integer.valueOf(split[2]);
-			case 2:
-				res[1] = Integer.valueOf(split[1]);
-			case 1:
-				res[0] = Integer.valueOf(split[0]);
+		case 3:
+			res[2] = Integer.valueOf(split[2]);
+			//$FALL-THROUGH$
+		case 2:
+			res[1] = Integer.valueOf(split[1]);
+			//$FALL-THROUGH$
+		case 1:
+			res[0] = Integer.valueOf(split[0]);
+			break;
+		default:
+			break;
 		}
 		return res;
 	}
@@ -234,9 +239,10 @@ public class Version implements Comparable<Version> {
 	public static void main(final String[] args) {
 		System.out.println(Version.compareVersions("1.0.0", "1.1.0"));
 		System.out.println(Version.compareVersions("2.0.0", "1.1.0"));
+		System.out.println(Version.compareVersions("2", "1.1.0"));
 		System.out.println(Version.compareVersions("1.2.0", "1.1.0"));
 		System.out.println(Version.compareVersions("1.0.1", "1.1.0"));
-		System.out.println(Version.compareVersions("1.1.1", "1.1.0"));
+		System.out.println(Version.compareVersions("1.1.1", "1.1"));
 	}
 
 }
