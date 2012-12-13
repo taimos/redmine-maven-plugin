@@ -193,13 +193,18 @@ public class Version implements Comparable<Version> {
 
 	private static int[] splitVersion(final String version) {
 		final String[] split = version.split("\\.");
-		if (split.length != 3) {
+		final int[] res = new int[3];
+		if (split.length > 3) {
 			throw new RuntimeException("Illegal version name");
 		}
-		final int[] res = new int[3];
-		res[0] = Integer.valueOf(split[0]);
-		res[1] = Integer.valueOf(split[1]);
-		res[2] = Integer.valueOf(split[2]);
+		switch (split.length) {
+			case 3:
+				res[2] = Integer.valueOf(split[2]);
+			case 2:
+				res[1] = Integer.valueOf(split[1]);
+			case 1:
+				res[0] = Integer.valueOf(split[0]);
+		}
 		return res;
 	}
 
