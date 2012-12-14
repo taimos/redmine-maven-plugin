@@ -25,48 +25,39 @@ public class DateDeserializer extends JsonDeserializer<Date> {
 
 	static Date parse(final String text) throws JsonParseException {
 		// BEWARE THIS IS UGLY CODE STYLE
-		Date parsed = null;
 
-		try {
-			// Redmine 2.x 2012-01-06T14:43:04Z
-			final SimpleDateFormat newDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-			parsed = newDF.parse(text);
-		} catch (final ParseException e) {
-			// cannot parse date so we try other format
-		}
+		// Redmine 2.x 2012-01-06T14:43:04Z
+		Date parsed = DateDeserializer.parseString(text, "yyyy-MM-dd'T'HH:mm:ssZ");
 
 		if (parsed == null) {
-			try {
-				// Redmine 2.x Date only 2012-01-06
-				final SimpleDateFormat newDF = new SimpleDateFormat("yyyy-MM-dd");
-				parsed = newDF.parse(text);
-			} catch (final ParseException e) {
-				// cannot parse date so we try other format
-			}
+			// Redmine 2.x Date only 2012-01-06
+			parsed = DateDeserializer.parseString(text, "yyyy-MM-dd");
 		}
 
 		if (parsed == null) {
-			try {
-				// Redmine 1.x 2012/10/09 09:29:19 +0200
-				final SimpleDateFormat oldDF = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
-				parsed = oldDF.parse(text);
-			} catch (final ParseException e) {
-				// cannot parse date so we try other format
-			}
+			// Redmine 1.x 2012/10/09 09:29:19 +0200
+			parsed = DateDeserializer.parseString(text, "yyyy/MM/dd HH:mm:ss Z");
 		}
+
 		if (parsed == null) {
-			try {
-				// Redmine 1.x Date only 2012/10/09
-				final SimpleDateFormat oldDF = new SimpleDateFormat("yyyy/MM/dd");
-				parsed = oldDF.parse(text);
-			} catch (final ParseException e) {
-				// cannot parse date so we try other format
-			}
+			// Redmine 1.x Date only 2012/10/09
+			DateDeserializer.parseString(text, "yyyy/MM/dd");
 		}
+
 		if (parsed == null) {
 			throw new RuntimeException("Cannot parse date");
 		}
 
 		return parsed;
+	}
+
+	private static Date parseString(String s, String pattern) {
+		try {
+			final SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+			return sdf.parse(s);
+		} catch (final ParseException e) {
+			// cannot parse date so we try other format
+		}
+		return null;
 	}
 }
