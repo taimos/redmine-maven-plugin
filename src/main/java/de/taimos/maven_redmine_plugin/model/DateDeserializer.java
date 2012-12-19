@@ -41,7 +41,7 @@ public class DateDeserializer extends JsonDeserializer<Date> {
 
 		if (parsed == null) {
 			// Redmine 1.x Date only 2012/10/09
-			DateDeserializer.parseString(text, "yyyy/MM/dd");
+			parsed = DateDeserializer.parseString(text, "yyyy/MM/dd");
 		}
 
 		if (parsed == null) {
