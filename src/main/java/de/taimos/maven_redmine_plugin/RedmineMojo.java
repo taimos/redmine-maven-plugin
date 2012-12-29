@@ -24,6 +24,8 @@ import org.apache.maven.plugin.MojoExecutionException;
  */
 public abstract class RedmineMojo extends AbstractMojo {
 
+	protected Redmine redmine;
+
 	/**
 	 * Redmine url.
 	 * 
@@ -55,8 +57,6 @@ public abstract class RedmineMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String projectVersionPrefix;
-
-	protected Redmine redmine;
 
 	protected final String getProjectIdentifier() {
 		return this.projectIdentifier;
