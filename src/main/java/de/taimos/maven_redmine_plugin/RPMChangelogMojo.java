@@ -2,13 +2,9 @@ package de.taimos.maven_redmine_plugin;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
-import de.taimos.maven_redmine_plugin.model.Ticket;
 import de.taimos.maven_redmine_plugin.model.Version;
 
 /**
@@ -16,7 +12,7 @@ import de.taimos.maven_redmine_plugin.model.Version;
  * 
  * @goal rpm-changelog
  */
-public class RPMChangelogMojo extends RedmineMojo {
+public class RPMChangelogMojo extends AbstractChangelogMojo {
 
 	/**
 	 * Changelog file
@@ -35,48 +31,36 @@ public class RPMChangelogMojo extends RedmineMojo {
 	private String rpmChangelogAuthor;
 
 	@Override
-	protected void doExecute() throws MojoExecutionException {
-		try {
-			this.rpmChangelogFile.getParentFile().mkdirs();
-		} catch (final Exception e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		}
+	protected String getVersionHeader(final String version, final String date) {
+		return String.format("* %s %s %s \n", date, this.rpmChangelogAuthor, version + "-1");
+	}
 
-		final List<Version> versions = this.redmine.getVersions(this.getProjectIdentifier());
-
-		final SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd yyyy");
-		// Sort versions
-		Collections.sort(versions);
-		// Newest first
-		Collections.reverse(versions);
-
-		final StringBuilder changelogText = new StringBuilder();
-
-		for (final Version v : versions) {
-			if (this.includeVersion(v)) {
-				final String date = sdf.format(v.getUpdated_on());
-				final String versionString = v.toVersionString() + "-1";
-				changelogText.append(String.format("* %s %s %s \n", date, this.rpmChangelogAuthor, versionString));
-				final List<Ticket> tickets = this.redmine.getClosedTickets(this.getProjectIdentifier(), v.getId());
-				Collections.sort(tickets);
-				for (final Ticket ticket : tickets) {
-					changelogText.append("- ");
-					changelogText.append(ticket.toString());
-					changelogText.append('\n');
-				}
-				changelogText.append("\n");
-			}
-		}
-
+	@Override
+	protected void doChangelog(final String changelog) throws MojoExecutionException {
 		try (FileWriter fw = new FileWriter(this.rpmChangelogFile)) {
 			// write changelog to file
-			fw.write(changelogText.toString());
+			fw.write(changelog);
 		} catch (final Exception e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
 	}
 
-	private boolean includeVersion(final Version v) {
+	@Override
+	protected void prepareExecute() throws MojoExecutionException {
+		try {
+			this.rpmChangelogFile.getParentFile().mkdirs();
+		} catch (final Exception e) {
+			throw new MojoExecutionException(e.getMessage(), e);
+		}
+	}
+
+	@Override
+	protected String getDateFormat() {
+		return "EEE MMM dd yyyy";
+	}
+
+	@Override
+	protected boolean includeVersion(final Version v) {
 		return v.getProjectPrefix().equals(this.getProjectVersionPrefix()) && v.getStatus().equals("closed");
 	}
 

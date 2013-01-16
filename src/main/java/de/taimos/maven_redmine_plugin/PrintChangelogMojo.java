@@ -1,8 +1,5 @@
 package de.taimos.maven_redmine_plugin;
 
-import java.io.File;
-import java.io.FileWriter;
-
 import org.apache.maven.plugin.MojoExecutionException;
 
 import de.taimos.maven_redmine_plugin.model.Version;
@@ -10,17 +7,9 @@ import de.taimos.maven_redmine_plugin.model.Version;
 /**
  * Goal which creates changelog file with all closed versions
  * 
- * @goal changelog
+ * @goal printchangelog
  */
-public class ChangelogMojo extends AbstractChangelogMojo {
-
-	/**
-	 * Changelog file
-	 * 
-	 * @parameter default-value="target/redmine/changelog"
-	 * @required
-	 */
-	private File changelogFile;
+public class PrintChangelogMojo extends AbstractChangelogMojo {
 
 	/**
 	 * Changelog version
@@ -43,25 +32,6 @@ public class ChangelogMojo extends AbstractChangelogMojo {
 
 	@Override
 	protected void doChangelog(final String changelog) throws MojoExecutionException {
-		try (FileWriter fw = new FileWriter(this.changelogFile)) {
-			// write changelog to file
-			fw.write(changelog);
-		} catch (final Exception e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		}
-	}
-
-	@Override
-	protected void prepareExecute() throws MojoExecutionException {
-		try {
-			this.changelogFile.getParentFile().mkdirs();
-		} catch (final Exception e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		}
-	}
-
-	@Override
-	protected String getDateFormat() {
-		return "MMM dd yyyy";
+		this.getLog().info(changelog);
 	}
 }

@@ -1,7 +1,9 @@
 package de.taimos.maven_redmine_plugin;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -115,7 +117,9 @@ public class Redmine {
 	 */
 	public void closeVersion(final Version version) {
 		try {
-			final String body = String.format("{\"version\":{\"name\":\"%s\",\"status\":\"closed\"}}", version.getName());
+			final String due = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+			final String bodyString = "{\"version\":{\"name\":\"%s\",\"status\":\"closed\",\"due_date\":\"%s\"}}";
+			final String body = String.format(bodyString, version.getName(), due);
 			final HTTPRequest req = this.createRequest("/versions/" + version.getId() + ".json");
 			req.header(WSConstants.HEADER_CONTENT_TYPE, "application/json");
 			final HttpResponse put = req.body(body).put();
