@@ -28,6 +28,8 @@ public class Redmine {
 	private final String redmineUrl;
 	private final String redmineKey;
 
+	private String versionDateFormat = "yyyy/MM/dd";
+
 	/**
 	 * @param redmineUrl
 	 *            the URL of the Redmine server
@@ -39,7 +41,22 @@ public class Redmine {
 		this.redmineKey = redmineKey;
 
 		this.mapper = new ObjectMapper();
-		this.mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		this.mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
+	}
+
+	/**
+	 * @return the versionDateFormat
+	 */
+	public String getVersionDateFormat() {
+		return this.versionDateFormat;
+	}
+
+	/**
+	 * @param versionDateFormat
+	 *            the versionDateFormat to set
+	 */
+	public void setVersionDateFormat(final String versionDateFormat) {
+		this.versionDateFormat = versionDateFormat;
 	}
 
 	/**
@@ -117,7 +134,7 @@ public class Redmine {
 	 */
 	public void closeVersion(final Version version) {
 		try {
-			final String due = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+			final String due = new SimpleDateFormat(this.versionDateFormat).format(new Date());
 			final String bodyString = "{\"version\":{\"name\":\"%s\",\"status\":\"closed\",\"due_date\":\"%s\"}}";
 			final String body = String.format(bodyString, version.getName(), due);
 			final HTTPRequest req = this.createRequest("/versions/" + version.getId() + ".json");

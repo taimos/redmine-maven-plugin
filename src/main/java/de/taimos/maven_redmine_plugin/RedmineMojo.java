@@ -54,9 +54,15 @@ public abstract class RedmineMojo extends AbstractMojo {
 	 * Project version prefix.
 	 * 
 	 * @parameter default-value="" expression="${projectVersionPrefix}"
-	 * @required
 	 */
-	private String projectVersionPrefix;
+	private final String projectVersionPrefix = "";
+
+	/**
+	 * Project version date format.
+	 * 
+	 * @parameter default-value="yyyy/MM/dd" expression="${versionDateFormat}"
+	 */
+	private final String versionDateFormat = "yyyy/MM/dd";
 
 	protected final String getProjectIdentifier() {
 		return this.projectIdentifier;
@@ -76,7 +82,7 @@ public abstract class RedmineMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException {
 		this.redmine = new Redmine(this.getRedmineURL(), this.redmineKey);
-
+		this.redmine.setVersionDateFormat(this.versionDateFormat);
 		this.doExecute();
 	}
 
