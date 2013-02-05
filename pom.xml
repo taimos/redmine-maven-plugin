@@ -66,12 +66,12 @@
 		<dependency>
 			<groupId>de.taimos</groupId>
 			<artifactId>httputils</artifactId>
-			<version>0.4.0</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.9.11</version>
+			<version>1.9.12</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
@@ -81,7 +81,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.10</version>
+			<version>4.11</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
