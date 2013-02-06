@@ -48,8 +48,6 @@ public class Redmine {
 	private final String redmineUrl;
 	private final String redmineKey;
 
-	private String versionDateFormat = "yyyy/MM/dd";
-
 	/**
 	 * @param redmineUrl
 	 *            the URL of the Redmine server
@@ -62,21 +60,6 @@ public class Redmine {
 
 		this.mapper = new ObjectMapper();
 		this.mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
-	}
-
-	/**
-	 * @return the versionDateFormat
-	 */
-	public String getVersionDateFormat() {
-		return this.versionDateFormat;
-	}
-
-	/**
-	 * @param versionDateFormat
-	 *            the versionDateFormat to set
-	 */
-	public void setVersionDateFormat(final String versionDateFormat) {
-		this.versionDateFormat = versionDateFormat;
 	}
 
 	/**
@@ -153,10 +136,26 @@ public class Redmine {
 	 *            the version to close
 	 */
 	public void closeVersion(final Version version) {
+		this.closeVersion(version, null);
+	}
+
+	/**
+	 * @param version
+	 *            the version to close
+	 * @param dateField
+	 *            the name of the due_date field or <code>null</code> to ignore
+	 */
+	public void closeVersion(final Version version, final String dateField) {
 		try {
-			final String due = new SimpleDateFormat(this.versionDateFormat).format(new Date());
-			final String bodyString = "{\"version\":{\"name\":\"%s\",\"status\":\"closed\",\"due_date\":\"%s\"}}";
-			final String body = String.format(bodyString, version.getName(), due);
+			final String body;
+			if (dateField != null && !dateField.trim().isEmpty()) {
+				final String due = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+				final String bodyString = "{\"version\":{\"name\":\"%s\",\"status\":\"closed\",\"%s\":\"%s\"}}";
+				body = String.format(bodyString, version.getName(), dateField, due);
+			} else {
+				final String bodyString = "{\"version\":{\"name\":\"%s\",\"status\":\"closed\"}}";
+				body = String.format(bodyString, version.getName());
+			}
 			final HTTPRequest req = this.createRequest("/versions/" + version.getId() + ".json");
 			req.header(WSConstants.HEADER_CONTENT_TYPE, "application/json");
 			final HttpResponse put = req.body(body).put();
