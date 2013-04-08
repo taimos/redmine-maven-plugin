@@ -7,7 +7,7 @@ Maven plugin for redmine
 	<plugin>
 		<groupId>de.taimos</groupId>
 		<artifactId>redmine-maven-plugin</artifactId>
-		<version>1.4.0</version>
+		<version>1.6.0</version>
 		<configuration>
 			<projectIdentifier>myproject</projectIdentifier>
 			<projectVersionPrefix>myprefix</projectVersionPrefix>
