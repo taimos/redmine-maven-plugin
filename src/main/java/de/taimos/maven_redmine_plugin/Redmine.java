@@ -144,34 +144,20 @@ public class Redmine {
 	 *            the version to close
 	 */
 	public void closeVersion(final Version version) {
-		this.closeVersion(version, null);
-	}
-
-	/**
-	 * @param version
-	 *            the version to close
-	 * @param dateField
-	 *            the name of the due_date field or <code>null</code> to ignore
-	 */
-	public void closeVersion(final Version version, final String dateField) {
 		try {
 			final String body;
-			if (dateField != null && !dateField.trim().isEmpty()) {
-				final String due = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
-				final String bodyString = "{\"version\":{\"name\":\"%s\",\"status\":\"closed\",\"%s\":\"%s\"}}";
-				body = String.format(bodyString, version.getName(), dateField, due);
-			} else {
-				final String bodyString = "{\"version\":{\"name\":\"%s\",\"status\":\"closed\"}}";
-				body = String.format(bodyString, version.getName());
-			}
+			final String due = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+			final String bodyString = "{\"version\":{\"name\":\"%s\",\"status\":\"closed\",\"due_date\":\"%s\"}}";
+			body = String.format(bodyString, version.getName(), due);
 			final HTTPRequest req = this.createRequest("/versions/" + version.getId() + ".json");
 			req.header(WSConstants.HEADER_CONTENT_TYPE, "application/json");
 			final HttpResponse put = req.body(body).put();
-			if (put.getStatusLine().getStatusCode() >= 400) {
+			if (!WS.isStatusOK(put)) {
 				throw new RuntimeException("Status change failed");
 			}
 		} catch (final Exception e) {
 			e.printStackTrace();
+			throw new RuntimeException("Status change failed");
 		}
 	}
 
@@ -187,11 +173,12 @@ public class Redmine {
 			final HTTPRequest req = this.createRequest("/projects/" + project + "/versions.json");
 			req.header(WSConstants.HEADER_CONTENT_TYPE, "application/json");
 			final HttpResponse put = req.body(body).post();
-			if (put.getStatusLine().getStatusCode() >= 400) {
+			if (!WS.isStatusOK(put)) {
 				throw new RuntimeException("Status change failed");
 			}
 		} catch (final Exception e) {
 			e.printStackTrace();
+			throw new RuntimeException("Status change failed");
 		}
 	}
 }

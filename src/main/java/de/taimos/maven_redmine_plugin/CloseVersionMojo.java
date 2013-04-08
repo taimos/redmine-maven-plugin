@@ -41,21 +41,18 @@ public class CloseVersionMojo extends RedmineMojo {
 	 */
 	private String closeVersion;
 
-	/**
-	 * Project version due_date field.
-	 * 
-	 * @parameter default-value="due_date" expression="${dateField}"
-	 */
-	private final String dateField = "due_date";
-
 	@Override
 	protected void doExecute() throws MojoExecutionException {
 		final List<Version> versions = this.redmine.getVersions(this.getProjectIdentifier());
 		for (final Version v : versions) {
 			if (this.checkVersion(v)) {
-				this.redmine.closeVersion(v, this.dateField);
+				this.redmine.closeVersion(v);
 				return;
 			}
+		}
+		if (this.getProjectVersionPrefix().isEmpty()) {
+			throw new MojoExecutionException(String.format("No version %s found for project %s.", Version.cleanSnapshot(this.closeVersion),
+					this.getProjectIdentifier()));
 		}
 		throw new MojoExecutionException(String.format("No version %s-%s found for project %s.", this.getProjectVersionPrefix(),
 				Version.cleanSnapshot(this.closeVersion), this.getProjectIdentifier()));
