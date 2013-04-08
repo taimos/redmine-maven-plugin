@@ -43,11 +43,19 @@ public class TicketDeserializer extends JsonDeserializer<Ticket> {
 		t.setSubject(json.get("subject").getTextValue());
 		t.setTracker(TicketDeserializer.getNestedName(json, "tracker"));
 		t.setAssignee(TicketDeserializer.getNestedName(json, "assigned_to"));
-		t.setAuthor(json.get("author").get("name").getTextValue());
-		t.setCreated(DateDeserializer.parse(json.get("created_on").getTextValue()));
-		t.setStartDate(DateDeserializer.parse(json.get("start_date").getTextValue()));
-		t.setUpdated(DateDeserializer.parse(json.get("updated_on").getTextValue()));
-		t.setDescription(json.get("description").getTextValue());
+		t.setAuthor(TicketDeserializer.getNestedName(json, "author"));
+		if (json.has("created_on")) {
+			t.setCreated(DateDeserializer.parse(json.get("created_on").getTextValue()));
+		}
+		if (json.has("start_date")) {
+			t.setStartDate(DateDeserializer.parse(json.get("start_date").getTextValue()));
+		}
+		if (json.has("updated_on")) {
+			t.setUpdated(DateDeserializer.parse(json.get("updated_on").getTextValue()));
+		}
+		if (json.has("description")) {
+			t.setDescription(json.get("description").getTextValue());
+		}
 		t.setFixedVersion(TicketDeserializer.getNestedName(json, "fixed_version"));
 		t.setPriority(TicketDeserializer.getNestedName(json, "priority"));
 		t.setStatus(TicketDeserializer.getNestedName(json, "status"));

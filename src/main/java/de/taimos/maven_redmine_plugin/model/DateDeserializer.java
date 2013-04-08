@@ -55,23 +55,13 @@ public class DateDeserializer extends JsonDeserializer<Date> {
 		}
 
 		if (parsed == null) {
-			// Redmine 1.x 2012/10/09 09:29:19 +0200
-			parsed = DateDeserializer.parseString(text, "yyyy/MM/dd HH:mm:ss Z");
-		}
-
-		if (parsed == null) {
-			// Redmine 1.x Date only 2012/10/09
-			parsed = DateDeserializer.parseString(text, "yyyy/MM/dd");
-		}
-
-		if (parsed == null) {
 			throw new RuntimeException("Cannot parse date");
 		}
 
 		return parsed;
 	}
 
-	private static Date parseString(String s, String pattern) {
+	private static Date parseString(final String s, final String pattern) {
 		try {
 			final SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 			return sdf.parse(s);

@@ -197,6 +197,10 @@ public class Version implements Comparable<Version> {
 		return comp;
 	}
 
+	public int compareToVersion(final String o) {
+		return Version.compareVersions(this.getNumericParts(), Version.splitVersion(o));
+	}
+
 	private static int compareVersions(final String me, final String other) {
 		return Version.compareVersions(Version.splitVersion(me), Version.splitVersion(other));
 	}
@@ -253,6 +257,19 @@ public class Version implements Comparable<Version> {
 		return version.replaceAll("-SNAPSHOT", "");
 	}
 
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("Version [description=");
+		builder.append(this.description);
+		builder.append(", name=");
+		builder.append(this.name);
+		builder.append(", status=");
+		builder.append(this.status);
+		builder.append("]");
+		return builder.toString();
+	}
+
 	/**
 	 * @param args
 	 */
@@ -262,7 +279,8 @@ public class Version implements Comparable<Version> {
 		System.out.println(Version.compareVersions("2", "1.1.0"));
 		System.out.println(Version.compareVersions("1.2.0", "1.1.0"));
 		System.out.println(Version.compareVersions("1.0.1", "1.1.0"));
-		System.out.println(Version.compareVersions("1.1.1", "1.1"));
+		System.out.println(Version.compareVersions("1.1.0", "1.1"));
+		System.out.println(Version.compareVersions("1.2", "1.1.2"));
 	}
 
 }

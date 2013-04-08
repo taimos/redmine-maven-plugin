@@ -95,9 +95,11 @@ public class Redmine {
 	 */
 	public Version getVersion(final String project, final String version) {
 		final List<Version> object = this.getVersions(project);
-		for (final Version v : object) {
-			if (v.getName().equals(version)) {
-				return v;
+		if (object != null) {
+			for (final Version v : object) {
+				if (v.getName().equals(version)) {
+					return v;
+				}
 			}
 		}
 		return null;
@@ -112,14 +114,20 @@ public class Redmine {
 		final HashMap<String, Object> map = this.getResponseAsMap("/projects/" + project + "/versions.json");
 		final List<HashMap<String, Object>> object = (List<HashMap<String, Object>>) map.get("versions");
 		final Version[] versions = this.mapper.convertValue(object, Version[].class);
-		return Arrays.asList(versions);
+		if (versions != null && versions.length != 0) {
+			return Arrays.asList(versions);
+		}
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
 	private HashMap<String, Object> getResponseAsMap(final String url) {
 		try {
+			System.out.println("URL: " + url);
 			final HttpResponse response = this.createRequest(url).get();
 			final String responseAsString = WS.getResponseAsString(response);
+			System.out.println("HTTP: " + responseAsString);
+			System.out.println();
 			return this.mapper.readValue(responseAsString, HashMap.class);
 		} catch (final Exception e) {
 			e.printStackTrace();

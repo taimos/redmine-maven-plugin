@@ -75,13 +75,16 @@ public abstract class RedmineMojo extends AbstractMojo {
 	 * 
 	 * @parameter default-value="" expression="${projectVersionPrefix}"
 	 */
-	private final String projectVersionPrefix = "";
+	private String projectVersionPrefix;
 
 	protected final String getProjectIdentifier() {
 		return this.projectIdentifier;
 	}
 
 	protected String getProjectVersionPrefix() {
+		if (this.projectVersionPrefix == null) {
+			return "";
+		}
 		return this.projectVersionPrefix;
 	}
 
@@ -95,6 +98,9 @@ public abstract class RedmineMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException {
 		this.redmine = new Redmine(this.getRedmineURL(), this.redmineKey);
+		final String format = "Connecting to Redmine for project %s and prefix %s";
+		final String prefix = this.projectVersionPrefix != null ? this.projectVersionPrefix : "''";
+		this.getLog().info(String.format(format, this.projectIdentifier, prefix));
 		this.doExecute();
 	}
 

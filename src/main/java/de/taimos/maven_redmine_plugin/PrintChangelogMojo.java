@@ -25,9 +25,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import de.taimos.maven_redmine_plugin.model.Version;
 
 /**
- * Goal which creates changelog file with all closed versions
+ * Goal which prints changelog of current version
  * 
- * @goal printchangelog
+ * @goal print
  */
 public class PrintChangelogMojo extends AbstractChangelogMojo {
 
