@@ -123,11 +123,8 @@ public class Redmine {
 	@SuppressWarnings("unchecked")
 	private HashMap<String, Object> getResponseAsMap(final String url) {
 		try {
-			System.out.println("URL: " + url);
 			final HttpResponse response = this.createRequest(url).get();
 			final String responseAsString = WS.getResponseAsString(response);
-			System.out.println("HTTP: " + responseAsString);
-			System.out.println();
 			return this.mapper.readValue(responseAsString, HashMap.class);
 		} catch (final Exception e) {
 			e.printStackTrace();
@@ -146,13 +143,14 @@ public class Redmine {
 	public void closeVersion(final Version version) {
 		try {
 			final String body;
-			final String due = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+			final String due = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 			final String bodyString = "{\"version\":{\"name\":\"%s\",\"status\":\"closed\",\"due_date\":\"%s\"}}";
 			body = String.format(bodyString, version.getName(), due);
 			final HTTPRequest req = this.createRequest("/versions/" + version.getId() + ".json");
 			req.header(WSConstants.HEADER_CONTENT_TYPE, "application/json");
 			final HttpResponse put = req.body(body).put();
 			if (!WS.isStatusOK(put)) {
+				System.out.println(WS.getResponseAsString(put));
 				throw new RuntimeException("Status change failed");
 			}
 		} catch (final Exception e) {
@@ -174,6 +172,7 @@ public class Redmine {
 			req.header(WSConstants.HEADER_CONTENT_TYPE, "application/json");
 			final HttpResponse put = req.body(body).post();
 			if (!WS.isStatusOK(put)) {
+				System.out.println(WS.getResponseAsString(put));
 				throw new RuntimeException("Status change failed");
 			}
 		} catch (final Exception e) {
