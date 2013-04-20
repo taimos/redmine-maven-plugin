@@ -67,15 +67,35 @@ public class Redmine {
 	 * @param version
 	 * @return list of {@link Ticket}
 	 */
-	@SuppressWarnings("unchecked")
 	public List<Ticket> getClosedTickets(final String project, final Integer version) {
-		// http://redmine/issues.json?project_id=<project>&fixed_version_id=<version>&status_id=closed
+		return this.getTickets(project, version, "closed");
+	}
+
+	/**
+	 * @param project
+	 * @param version
+	 * @return list of {@link Ticket}
+	 */
+	public List<Ticket> getOpenTickets(final String project, final Integer version) {
+		return this.getTickets(project, version, "open");
+	}
+
+	/**
+	 * @param project
+	 * @param version
+	 * @param status
+	 * @return list of {@link Ticket}
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Ticket> getTickets(final String project, final Integer version, final String status) {
+		// http://redmine/issues.json?project_id=<project>&fixed_version_id=<version>&status_id=<status>
 		final List<Ticket> tickets = new ArrayList<>();
 
 		int offset = 0;
 		int count = Integer.MAX_VALUE;
 		while ((tickets.size() < count) && (offset < count)) {
-			final String url = "/issues.json?project_id=" + project + "&fixed_version_id=" + version + "&status_id=closed&offset=" + offset;
+			final String url = "/issues.json?project_id=" + project + "&fixed_version_id=" + version + "&status_id=" + status + "&offset="
+					+ offset;
 			final HashMap<String, Object> map = this.getResponseAsMap(url);
 			final List<HashMap<String, Object>> issues = (List<HashMap<String, Object>>) map.get("issues");
 			count = (int) map.get("total_count");
