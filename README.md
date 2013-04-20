@@ -17,6 +17,7 @@ Valid versions are e.g.:
 * _rpm-changelog_ to create changelog with RPM style (All closed versions)
 * _close-version_ to close version
 * _create-version_ to create new version
+* _rename-version_ to rename a version
 * _print_ to print changelog to console
 * _assert-closed_ to assert that all tickets are closed
 
@@ -51,6 +52,10 @@ Find below the possible parameters for the plugin. The string in () is the maven
 
 ### create-version
 * _createVersion_ The version to create (createVersion) [${project.version}]
+
+### rename-version
+* _renameVersion_ The version to rename (renameVersion) [${project.version}]
+* _newName_ The new version name (newName) [${project.version}]
 
 ### assert-closed
 * _assertVersion_ The version to check for open tickets (assertVersion) [${project.version}]
