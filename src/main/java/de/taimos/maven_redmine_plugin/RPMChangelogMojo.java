@@ -88,11 +88,8 @@ public class RPMChangelogMojo extends AbstractChangelogMojo {
 
 	@Override
 	protected boolean includeVersion(final Version v) {
-		System.out.println("Check version" + v);
 		final boolean include = v.getProjectPrefix().equals(this.getProjectVersionPrefix()) && v.getStatus().equals("closed");
-		System.out.println("Version check: " + include);
 		if (include) {
-			System.out.println("Compare: " + v.compareToVersion(this.rpmMinimalVersion));
 			return v.compareToVersion(this.rpmMinimalVersion) >= 0;
 		}
 		return false;
