@@ -54,10 +54,12 @@ public class AssertClosedMojo extends RedmineMojo {
 
 		final List<Ticket> tickets = this.redmine.getOpenTickets(this.getProjectIdentifier(), versionId);
 		if (!tickets.isEmpty()) {
+			final String errorText = "Found " + tickets.size() + " open tickets.";
+			this.getLog().error(errorText);
 			for (final Ticket ticket : tickets) {
 				this.getLog().warn("- " + ticket.toString());
 			}
-			throw new MojoExecutionException("Found " + tickets.size() + " open tickets.");
+			throw new MojoExecutionException(errorText);
 		}
 	}
 

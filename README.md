@@ -18,6 +18,7 @@ Valid versions are e.g.:
 * _close-version_ to close version
 * _create-version_ to create new version
 * _print_ to print changelog to console
+* _assert-closed_ to assert that all tickets are closed
 
 ## Configuration
 
@@ -50,6 +51,9 @@ Find below the possible parameters for the plugin. The string in () is the maven
 
 ### create-version
 * _createVersion_ The version to create (createVersion) [${project.version}]
+
+### assert-closed
+* _assertVersion_ The version to check for open tickets (assertVersion) [${project.version}]
 
 ## Usage example
 
