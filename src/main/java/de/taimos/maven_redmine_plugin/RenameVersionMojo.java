@@ -29,36 +29,46 @@ import de.taimos.maven_redmine_plugin.model.Version;
 /**
  * Goal which closes the given version
  * 
- * @goal close-version
+ * @goal rename-version
  */
-public class CloseVersionMojo extends RedmineMojo {
+public class RenameVersionMojo extends RedmineMojo {
 
 	/**
-	 * the version to close
+	 * The version to rename
 	 * 
-	 * @parameter expression="${closeVersion}" default-value="${project.version}"
+	 * @parameter expression="${renameVersion}" default-value="${project.version}"
 	 * @required
 	 */
-	private String closeVersion;
+	private String renameVersion;
+
+	/**
+	 * The new name of the version
+	 * 
+	 * @parameter expression="${newName}" default-value="${project.version}"
+	 * @required
+	 */
+	private String newName;
 
 	@Override
 	protected void doExecute() throws MojoExecutionException {
 		final List<Version> versions = this.redmine.getVersions(this.getProjectIdentifier());
 		for (final Version v : versions) {
 			if (this.checkVersion(v)) {
-				this.redmine.closeVersion(v);
+				final String name = Version.createName(this.getProjectVersionPrefix(), Version.cleanSnapshot(this.newName));
+				this.redmine.renameVersion(v, name);
 				return;
 			}
 		}
 		if (this.getProjectVersionPrefix().isEmpty()) {
-			throw new MojoExecutionException(String.format("No version %s found for project %s.", Version.cleanSnapshot(this.closeVersion),
-					this.getProjectIdentifier()));
+			throw new MojoExecutionException(String.format("No version %s found for project %s.",
+					Version.cleanSnapshot(this.renameVersion), this.getProjectIdentifier()));
 		}
 		throw new MojoExecutionException(String.format("No version %s-%s found for project %s.", this.getProjectVersionPrefix(),
-				Version.cleanSnapshot(this.closeVersion), this.getProjectIdentifier()));
+				Version.cleanSnapshot(this.renameVersion), this.getProjectIdentifier()));
 	}
 
 	private boolean checkVersion(final Version v) {
-		return v.getName().equals(Version.createName(this.getProjectVersionPrefix(), Version.cleanSnapshot(this.closeVersion)));
+		return v.getName().equals(Version.createName(this.getProjectVersionPrefix(), Version.cleanSnapshot(this.renameVersion)));
 	}
+
 }

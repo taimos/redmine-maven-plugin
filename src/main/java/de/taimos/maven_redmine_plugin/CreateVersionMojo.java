@@ -34,7 +34,7 @@ import de.taimos.maven_redmine_plugin.model.Version;
 public class CreateVersionMojo extends RedmineMojo {
 
 	/**
-	 * Changelog author
+	 * the version to create
 	 * 
 	 * @parameter expression="${createVersion}" default-value="${project.version}"
 	 * @required

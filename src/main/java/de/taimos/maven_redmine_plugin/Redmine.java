@@ -180,6 +180,28 @@ public class Redmine {
 	}
 
 	/**
+	 * @param version
+	 *            the version to close
+	 * @param newName
+	 *            the new version name
+	 */
+	public void renameVersion(final Version version, final String newName) {
+		try {
+			final String body = String.format("{\"version\":{\"name\":\"%s\"}}", newName);
+			final HTTPRequest req = this.createRequest("/versions/" + version.getId() + ".json");
+			req.header(WSConstants.HEADER_CONTENT_TYPE, "application/json");
+			final HttpResponse put = req.body(body).put();
+			if (!WS.isStatusOK(put)) {
+				System.out.println(WS.getResponseAsString(put));
+				throw new RuntimeException("Status change failed");
+			}
+		} catch (final Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("Status change failed");
+		}
+	}
+
+	/**
 	 * @param project
 	 *            the project identifier
 	 * @param name
