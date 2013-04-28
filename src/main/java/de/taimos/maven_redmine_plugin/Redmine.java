@@ -1,23 +1,14 @@
 package de.taimos.maven_redmine_plugin;
 
 /*
- * #%L
- * redmine-maven-plugin Maven Mojo
- * %%
- * Copyright (C) 2012 - 2013 Taimos GmbH
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * #%L redmine-maven-plugin Maven Mojo %% Copyright (C) 2012 - 2013 Taimos GmbH %% Licensed under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License. #L%
  */
 
 import java.text.SimpleDateFormat;
@@ -42,26 +33,25 @@ import de.taimos.maven_redmine_plugin.model.Version;
  * 
  */
 public class Redmine {
-
+	
 	private final ObjectMapper mapper;
-
+	
 	private final String redmineUrl;
 	private final String redmineKey;
-
+	
+	
 	/**
-	 * @param redmineUrl
-	 *            the URL of the Redmine server
-	 * @param redmineKey
-	 *            the API KEy to connect to Redmine
+	 * @param redmineUrl the URL of the Redmine server
+	 * @param redmineKey the API KEy to connect to Redmine
 	 */
 	public Redmine(final String redmineUrl, final String redmineKey) {
 		this.redmineUrl = redmineUrl;
 		this.redmineKey = redmineKey;
-
+		
 		this.mapper = new ObjectMapper();
 		this.mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
 	}
-
+	
 	/**
 	 * @param project
 	 * @param version
@@ -70,7 +60,7 @@ public class Redmine {
 	public List<Ticket> getClosedTickets(final String project, final Integer version) {
 		return this.getTickets(project, version, "closed");
 	}
-
+	
 	/**
 	 * @param project
 	 * @param version
@@ -79,35 +69,33 @@ public class Redmine {
 	public List<Ticket> getOpenTickets(final String project, final Integer version) {
 		return this.getTickets(project, version, "open");
 	}
-
+	
 	/**
 	 * @param project
 	 * @param version
 	 * @param status
 	 * @return list of {@link Ticket}
 	 */
-	@SuppressWarnings("unchecked")
 	public List<Ticket> getTickets(final String project, final Integer version, final String status) {
 		// http://redmine/issues.json?project_id=<project>&fixed_version_id=<version>&status_id=<status>
 		final List<Ticket> tickets = new ArrayList<>();
-
+		
 		int offset = 0;
 		int count = Integer.MAX_VALUE;
 		while ((tickets.size() < count) && (offset < count)) {
-			final String url = "/issues.json?project_id=" + project + "&fixed_version_id=" + version + "&status_id=" + status + "&offset="
-					+ offset;
+			final String url = "/issues.json?project_id=" + project + "&fixed_version_id=" + version + "&status_id=" + status + "&offset=" + offset;
 			final HashMap<String, Object> map = this.getResponseAsMap(url);
 			final List<HashMap<String, Object>> issues = (List<HashMap<String, Object>>) map.get("issues");
 			count = (int) map.get("total_count");
 			offset += 25;
-
+			
 			for (final HashMap<String, Object> hashMap : issues) {
 				tickets.add(this.mapper.convertValue(hashMap, Ticket.class));
 			}
 		}
 		return tickets;
 	}
-
+	
 	/**
 	 * @param project
 	 * @param version
@@ -124,23 +112,21 @@ public class Redmine {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * @param project
 	 * @return array of {@link Version}
 	 */
-	@SuppressWarnings("unchecked")
 	public List<Version> getVersions(final String project) {
 		final HashMap<String, Object> map = this.getResponseAsMap("/projects/" + project + "/versions.json");
 		final List<HashMap<String, Object>> object = (List<HashMap<String, Object>>) map.get("versions");
 		final Version[] versions = this.mapper.convertValue(object, Version[].class);
-		if (versions != null && versions.length != 0) {
+		if ((versions != null) && (versions.length != 0)) {
 			return Arrays.asList(versions);
 		}
 		return new ArrayList<>();
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	private HashMap<String, Object> getResponseAsMap(final String url) {
 		try {
 			final HttpResponse response = this.createRequest(url).get();
@@ -151,14 +137,13 @@ public class Redmine {
 		}
 		return new HashMap<>();
 	}
-
+	
 	private HTTPRequest createRequest(final String url) {
 		return WS.url(this.redmineUrl + url).header("X-Redmine-API-Key", this.redmineKey);
 	}
-
+	
 	/**
-	 * @param version
-	 *            the version to close
+	 * @param version the version to close
 	 */
 	public void closeVersion(final Version version) {
 		try {
@@ -178,12 +163,10 @@ public class Redmine {
 			throw new RuntimeException("Status change failed");
 		}
 	}
-
+	
 	/**
-	 * @param version
-	 *            the version to close
-	 * @param newName
-	 *            the new version name
+	 * @param version the version to close
+	 * @param newName the new version name
 	 */
 	public void renameVersion(final Version version, final String newName) {
 		try {
@@ -200,12 +183,10 @@ public class Redmine {
 			throw new RuntimeException("Status change failed");
 		}
 	}
-
+	
 	/**
-	 * @param project
-	 *            the project identifier
-	 * @param name
-	 *            the version name
+	 * @param project the project identifier
+	 * @param name the version name
 	 */
 	public void createVersion(final String project, final String name) {
 		try {

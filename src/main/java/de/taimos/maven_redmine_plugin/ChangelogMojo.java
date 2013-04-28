@@ -1,23 +1,14 @@
 package de.taimos.maven_redmine_plugin;
 
 /*
- * #%L
- * redmine-maven-plugin Maven Mojo
- * %%
- * Copyright (C) 2012 - 2013 Taimos GmbH
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * #%L redmine-maven-plugin Maven Mojo %% Copyright (C) 2012 - 2013 Taimos GmbH %% Licensed under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License. #L%
  */
 
 import java.io.File;
@@ -33,7 +24,7 @@ import de.taimos.maven_redmine_plugin.model.Version;
  * @goal changelog
  */
 public class ChangelogMojo extends AbstractChangelogMojo {
-
+	
 	/**
 	 * Changelog file
 	 * 
@@ -41,7 +32,7 @@ public class ChangelogMojo extends AbstractChangelogMojo {
 	 * @required
 	 */
 	private File changelogFile;
-
+	
 	/**
 	 * Changelog version
 	 * 
@@ -49,18 +40,19 @@ public class ChangelogMojo extends AbstractChangelogMojo {
 	 * @required
 	 */
 	private String changelogVersion;
-
+	
+	
 	@Override
 	protected String getVersionHeader(final String version, final String date) {
 		return String.format("Version %s (%s) \n", version, date);
 	}
-
+	
 	@Override
 	protected boolean includeVersion(final Version v) throws MojoExecutionException {
 		final String version = Version.cleanSnapshot(this.changelogVersion);
 		return v.getName().equals(Version.createName(this.getProjectVersionPrefix(), version));
 	}
-
+	
 	@Override
 	protected void doChangelog(final String changelog) throws MojoExecutionException {
 		try (FileWriter fw = new FileWriter(this.changelogFile)) {
@@ -70,7 +62,7 @@ public class ChangelogMojo extends AbstractChangelogMojo {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
 	}
-
+	
 	@Override
 	protected void prepareExecute() throws MojoExecutionException {
 		try {
@@ -79,7 +71,7 @@ public class ChangelogMojo extends AbstractChangelogMojo {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
 	}
-
+	
 	@Override
 	protected String getDateFormat() {
 		return "MMM dd yyyy";

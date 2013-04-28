@@ -1,23 +1,14 @@
 package de.taimos.maven_redmine_plugin.model;
 
 /*
- * #%L
- * redmine-maven-plugin Maven Mojo
- * %%
- * Copyright (C) 2012 - 2013 Taimos GmbH
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * #%L redmine-maven-plugin Maven Mojo %% Copyright (C) 2012 - 2013 Taimos GmbH %% Licensed under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License. #L%
  */
 
 import java.util.Date;
@@ -30,228 +21,216 @@ import org.codehaus.jackson.map.annotate.JsonDeserialize;
  */
 @JsonDeserialize(using = TicketDeserializer.class)
 public class Ticket implements Comparable<Ticket> {
-
+	
 	private Integer id;
-
+	
 	private String tracker;
-
+	
 	private String subject;
-
+	
 	private String assignee;
-
+	
 	private String author;
-
+	
 	private Date created;
-
+	
 	private String description;
-
+	
 	private Integer doneRatio;
-
+	
 	private String fixedVersion;
-
+	
 	private String priority;
-
+	
 	private Date startDate;
-
+	
 	private String status;
-
+	
 	private Date updated;
-
+	
+	
 	/**
 	 * @return the id
 	 */
 	public Integer getId() {
 		return this.id;
 	}
-
+	
 	/**
-	 * @param id
-	 *            the id to set
+	 * @param id the id to set
 	 */
 	public void setId(final Integer id) {
 		this.id = id;
 	}
-
+	
 	/**
 	 * @return the tracker
 	 */
 	public String getTracker() {
 		return this.tracker;
 	}
-
+	
 	/**
-	 * @param tracker
-	 *            the tracker to set
+	 * @param tracker the tracker to set
 	 */
 	public void setTracker(final String tracker) {
 		this.tracker = tracker;
 	}
-
+	
 	/**
 	 * @return the subject
 	 */
 	public String getSubject() {
 		return this.subject;
 	}
-
+	
 	/**
-	 * @param subject
-	 *            the subject to set
+	 * @param subject the subject to set
 	 */
 	public void setSubject(final String subject) {
 		this.subject = subject;
 	}
-
+	
 	/**
 	 * @return the assignee
 	 */
 	public String getAssignee() {
 		return this.assignee;
 	}
-
+	
 	/**
-	 * @param assignee
-	 *            the assignee to set
+	 * @param assignee the assignee to set
 	 */
 	public void setAssignee(final String assignee) {
 		this.assignee = assignee;
 	}
-
+	
 	/**
 	 * @return the author
 	 */
 	public String getAuthor() {
 		return this.author;
 	}
-
+	
 	/**
-	 * @param author
-	 *            the author to set
+	 * @param author the author to set
 	 */
 	public void setAuthor(final String author) {
 		this.author = author;
 	}
-
+	
 	/**
 	 * @return the created
 	 */
 	public Date getCreated() {
 		return this.created;
 	}
-
+	
 	/**
-	 * @param created
-	 *            the created to set
+	 * @param created the created to set
 	 */
 	public void setCreated(final Date created) {
 		this.created = created;
 	}
-
+	
 	/**
 	 * @return the description
 	 */
 	public String getDescription() {
 		return this.description;
 	}
-
+	
 	/**
-	 * @param description
-	 *            the description to set
+	 * @param description the description to set
 	 */
 	public void setDescription(final String description) {
 		this.description = description;
 	}
-
+	
 	/**
 	 * @return the doneRatio
 	 */
 	public Integer getDoneRatio() {
 		return this.doneRatio;
 	}
-
+	
 	/**
-	 * @param doneRatio
-	 *            the doneRatio to set
+	 * @param doneRatio the doneRatio to set
 	 */
 	public void setDoneRatio(final Integer doneRatio) {
 		this.doneRatio = doneRatio;
 	}
-
+	
 	/**
 	 * @return the fixedVersion
 	 */
 	public String getFixedVersion() {
 		return this.fixedVersion;
 	}
-
+	
 	/**
-	 * @param fixedVersion
-	 *            the fixedVersion to set
+	 * @param fixedVersion the fixedVersion to set
 	 */
 	public void setFixedVersion(final String fixedVersion) {
 		this.fixedVersion = fixedVersion;
 	}
-
+	
 	/**
 	 * @return the priority
 	 */
 	public String getPriority() {
 		return this.priority;
 	}
-
+	
 	/**
-	 * @param priority
-	 *            the priority to set
+	 * @param priority the priority to set
 	 */
 	public void setPriority(final String priority) {
 		this.priority = priority;
 	}
-
+	
 	/**
 	 * @return the startDate
 	 */
 	public Date getStartDate() {
 		return this.startDate;
 	}
-
+	
 	/**
-	 * @param startDate
-	 *            the startDate to set
+	 * @param startDate the startDate to set
 	 */
 	public void setStartDate(final Date startDate) {
 		this.startDate = startDate;
 	}
-
+	
 	/**
 	 * @return the status
 	 */
 	public String getStatus() {
 		return this.status;
 	}
-
+	
 	/**
-	 * @param status
-	 *            the status to set
+	 * @param status the status to set
 	 */
 	public void setStatus(final String status) {
 		this.status = status;
 	}
-
+	
 	/**
 	 * @return the updated
 	 */
 	public Date getUpdated() {
 		return this.updated;
 	}
-
+	
 	/**
-	 * @param updated
-	 *            the updated to set
+	 * @param updated the updated to set
 	 */
 	public void setUpdated(final Date updated) {
 		this.updated = updated;
 	}
-
+	
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
@@ -262,7 +241,7 @@ public class Ticket implements Comparable<Ticket> {
 		sb.append(this.subject);
 		return sb.toString();
 	}
-
+	
 	@Override
 	public int compareTo(final Ticket o) {
 		int res = this.tracker.compareTo(o.tracker);
@@ -271,5 +250,5 @@ public class Ticket implements Comparable<Ticket> {
 		}
 		return res;
 	}
-
+	
 }

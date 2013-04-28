@@ -1,23 +1,14 @@
 package de.taimos.maven_redmine_plugin;
 
 /*
- * #%L
- * redmine-maven-plugin Maven Mojo
- * %%
- * Copyright (C) 2012 - 2013 Taimos GmbH
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * #%L redmine-maven-plugin Maven Mojo %% Copyright (C) 2012 - 2013 Taimos GmbH %% Licensed under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License. #L%
  */
 
 import java.io.File;
@@ -33,7 +24,7 @@ import de.taimos.maven_redmine_plugin.model.Version;
  * @goal rpm-changelog
  */
 public class RPMChangelogMojo extends AbstractChangelogMojo {
-
+	
 	/**
 	 * Changelog file
 	 * 
@@ -41,7 +32,7 @@ public class RPMChangelogMojo extends AbstractChangelogMojo {
 	 * @required
 	 */
 	private File rpmChangelogFile;
-
+	
 	/**
 	 * Changelog author
 	 * 
@@ -49,19 +40,20 @@ public class RPMChangelogMojo extends AbstractChangelogMojo {
 	 * @required
 	 */
 	private String rpmChangelogAuthor;
-
+	
 	/**
 	 * minimal changelog version
 	 * 
 	 * @parameter default-value="0.0.0" expression="${rpmMinimalVersion}"
 	 */
 	private String rpmMinimalVersion;
-
+	
+	
 	@Override
 	protected String getVersionHeader(final String version, final String date) {
 		return String.format("* %s %s %s \n", date, this.rpmChangelogAuthor, version + "-1");
 	}
-
+	
 	@Override
 	protected void doChangelog(final String changelog) throws MojoExecutionException {
 		try (FileWriter fw = new FileWriter(this.rpmChangelogFile)) {
@@ -71,7 +63,7 @@ public class RPMChangelogMojo extends AbstractChangelogMojo {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
 	}
-
+	
 	@Override
 	protected void prepareExecute() throws MojoExecutionException {
 		try {
@@ -80,12 +72,12 @@ public class RPMChangelogMojo extends AbstractChangelogMojo {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
 	}
-
+	
 	@Override
 	protected String getDateFormat() {
 		return "EEE MMM dd yyyy";
 	}
-
+	
 	@Override
 	protected boolean includeVersion(final Version v) {
 		final boolean include = v.getProjectPrefix().equals(this.getProjectVersionPrefix()) && v.getStatus().equals("closed");
@@ -94,5 +86,5 @@ public class RPMChangelogMojo extends AbstractChangelogMojo {
 		}
 		return false;
 	}
-
+	
 }
