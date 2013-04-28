@@ -46,4 +46,9 @@ public class PrintChangelogMojo extends AbstractChangelogMojo {
 	protected void doChangelog(final String changelog) throws MojoExecutionException {
 		this.getLog().info(changelog);
 	}
+	
+	@Override
+	protected String getEmptyVersionString() {
+		return "No tickets found";
+	}
 }

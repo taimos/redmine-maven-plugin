@@ -87,4 +87,9 @@ public class RPMChangelogMojo extends AbstractChangelogMojo {
 		return false;
 	}
 	
+	@Override
+	protected String getEmptyVersionString() {
+		return "No tickets found";
+	}
+	
 }

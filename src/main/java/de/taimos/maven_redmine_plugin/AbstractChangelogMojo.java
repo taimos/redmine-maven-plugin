@@ -46,6 +46,10 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 				final List<Ticket> tickets = this.redmine.getClosedTickets(this.getProjectIdentifier(), v.getId());
 				if (tickets.isEmpty()) {
 					this.getLog().warn("No tickets found for version: " + v.toVersionString());
+					String empty = this.getEmptyVersionString();
+					if (empty != null) {
+						changelogText.append(empty);
+					}
 				} else {
 					Collections.sort(tickets);
 					for (final Ticket ticket : tickets) {
@@ -60,6 +64,8 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		
 		this.doChangelog(changelogText.toString());
 	}
+	
+	protected abstract String getEmptyVersionString();
 	
 	protected abstract void doChangelog(String changelog) throws MojoExecutionException;
 	

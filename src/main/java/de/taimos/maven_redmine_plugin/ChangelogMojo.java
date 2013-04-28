@@ -76,4 +76,9 @@ public class ChangelogMojo extends AbstractChangelogMojo {
 	protected String getDateFormat() {
 		return "MMM dd yyyy";
 	}
+	
+	@Override
+	protected String getEmptyVersionString() {
+		return "No tickets found";
+	}
 }
