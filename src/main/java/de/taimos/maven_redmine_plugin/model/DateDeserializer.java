@@ -45,7 +45,7 @@ public class DateDeserializer extends JsonDeserializer<Date> {
 		}
 		
 		if (parsed == null) {
-			throw new RuntimeException("Cannot parse date");
+			throw new RedmineException("Cannot parse date");
 		}
 		
 		return parsed;

@@ -19,12 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
+import org.apache.maven.plugin.logging.Log;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import de.taimos.httputils.HTTPRequest;
 import de.taimos.httputils.WS;
 import de.taimos.httputils.WSConstants;
+import de.taimos.maven_redmine_plugin.model.RedmineException;
 import de.taimos.maven_redmine_plugin.model.Ticket;
 import de.taimos.maven_redmine_plugin.model.Version;
 
@@ -34,19 +36,25 @@ import de.taimos.maven_redmine_plugin.model.Version;
  */
 public class Redmine {
 	
+	private static final String STATUS_OPEN = "open";
+	
+	private static final String STATUS_CLOSED = "closed";
+	
 	private final ObjectMapper mapper;
 	
 	private final String redmineUrl;
 	private final String redmineKey;
+	private final Log log;
 	
 	
 	/**
 	 * @param redmineUrl the URL of the Redmine server
 	 * @param redmineKey the API KEy to connect to Redmine
 	 */
-	public Redmine(final String redmineUrl, final String redmineKey) {
+	public Redmine(final String redmineUrl, final String redmineKey, Log log) {
 		this.redmineUrl = redmineUrl;
 		this.redmineKey = redmineKey;
+		this.log = log;
 		
 		this.mapper = new ObjectMapper();
 		this.mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -58,7 +66,7 @@ public class Redmine {
 	 * @return list of {@link Ticket}
 	 */
 	public List<Ticket> getClosedTickets(final String project, final Integer version) {
-		return this.getTickets(project, version, "closed");
+		return this.getTickets(project, version, Redmine.STATUS_CLOSED);
 	}
 	
 	/**
@@ -67,7 +75,7 @@ public class Redmine {
 	 * @return list of {@link Ticket}
 	 */
 	public List<Ticket> getOpenTickets(final String project, final Integer version) {
-		return this.getTickets(project, version, "open");
+		return this.getTickets(project, version, Redmine.STATUS_OPEN);
 	}
 	
 	/**
@@ -133,7 +141,7 @@ public class Redmine {
 			final String responseAsString = WS.getResponseAsString(response);
 			return this.mapper.readValue(responseAsString, HashMap.class);
 		} catch (final Exception e) {
-			e.printStackTrace();
+			this.log.error(e);
 		}
 		return new HashMap<>();
 	}
@@ -155,12 +163,12 @@ public class Redmine {
 			req.header(WSConstants.HEADER_CONTENT_TYPE, "application/json");
 			final HttpResponse put = req.body(body).put();
 			if (!WS.isStatusOK(put)) {
-				System.out.println(WS.getResponseAsString(put));
-				throw new RuntimeException("Status change failed");
+				this.log.error(WS.getResponseAsString(put));
+				throw new RedmineException("Status change failed");
 			}
 		} catch (final Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("Status change failed");
+			this.log.error(e);
+			throw new RedmineException("Status change failed", e);
 		}
 	}
 	
@@ -175,12 +183,12 @@ public class Redmine {
 			req.header(WSConstants.HEADER_CONTENT_TYPE, "application/json");
 			final HttpResponse put = req.body(body).put();
 			if (!WS.isStatusOK(put)) {
-				System.out.println(WS.getResponseAsString(put));
-				throw new RuntimeException("Status change failed");
+				this.log.error(WS.getResponseAsString(put));
+				throw new RedmineException("Status change failed");
 			}
 		} catch (final Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("Status change failed");
+			this.log.error(e);
+			throw new RedmineException("Status change failed", e);
 		}
 	}
 	
@@ -195,12 +203,12 @@ public class Redmine {
 			req.header(WSConstants.HEADER_CONTENT_TYPE, "application/json");
 			final HttpResponse put = req.body(body).post();
 			if (!WS.isStatusOK(put)) {
-				System.out.println(WS.getResponseAsString(put));
-				throw new RuntimeException("Status change failed");
+				this.log.error(WS.getResponseAsString(put));
+				throw new RedmineException("Status change failed");
 			}
 		} catch (final Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException("Status change failed");
+			throw new RedmineException("Status change failed", e);
 		}
 	}
 }

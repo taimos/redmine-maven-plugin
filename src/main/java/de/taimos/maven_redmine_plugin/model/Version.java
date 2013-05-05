@@ -186,7 +186,7 @@ public class Version implements Comparable<Version> {
 		return Version.compareVersions(this.getNumericParts(), Version.splitVersion(o));
 	}
 	
-	private static int compareVersions(final String me, final String other) {
+	public static int compareVersions(final String me, final String other) {
 		return Version.compareVersions(Version.splitVersion(me), Version.splitVersion(other));
 	}
 	
@@ -203,7 +203,7 @@ public class Version implements Comparable<Version> {
 	private static int[] splitVersion(final String version) {
 		final String[] split = version.split("\\.");
 		if (split.length > 3) {
-			throw new RuntimeException("Illegal version name");
+			throw new RedmineException("Illegal version name");
 		}
 		final int[] res = new int[3];
 		switch (split.length) {
@@ -253,19 +253,6 @@ public class Version implements Comparable<Version> {
 		builder.append(this.status);
 		builder.append("]");
 		return builder.toString();
-	}
-	
-	/**
-	 * @param args
-	 */
-	public static void main(final String[] args) {
-		System.out.println(Version.compareVersions("1.0.0", "1.1.0"));
-		System.out.println(Version.compareVersions("2.0.0", "1.1.0"));
-		System.out.println(Version.compareVersions("2", "1.1.0"));
-		System.out.println(Version.compareVersions("1.2.0", "1.1.0"));
-		System.out.println(Version.compareVersions("1.0.1", "1.1.0"));
-		System.out.println(Version.compareVersions("1.1.0", "1.1"));
-		System.out.println(Version.compareVersions("1.2", "1.1.2"));
 	}
 	
 }
