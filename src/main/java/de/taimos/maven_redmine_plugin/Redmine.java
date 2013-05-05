@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.maven.plugin.logging.Log;
@@ -35,6 +36,10 @@ import de.taimos.maven_redmine_plugin.model.Version;
  * 
  */
 public class Redmine {
+	
+	private static final String APPLICATION_JSON = "application/json";
+	
+	private static final String STATUS_CHANGE_FAILED = "Status change failed";
 	
 	private static final String STATUS_OPEN = "open";
 	
@@ -92,7 +97,7 @@ public class Redmine {
 		int count = Integer.MAX_VALUE;
 		while ((tickets.size() < count) && (offset < count)) {
 			final String url = "/issues.json?project_id=" + project + "&fixed_version_id=" + version + "&status_id=" + status + "&offset=" + offset;
-			final HashMap<String, Object> map = this.getResponseAsMap(url);
+			final Map<String, Object> map = this.getResponseAsMap(url);
 			final List<HashMap<String, Object>> issues = (List<HashMap<String, Object>>) map.get("issues");
 			count = (int) map.get("total_count");
 			offset += 25;
@@ -126,7 +131,7 @@ public class Redmine {
 	 * @return array of {@link Version}
 	 */
 	public List<Version> getVersions(final String project) {
-		final HashMap<String, Object> map = this.getResponseAsMap("/projects/" + project + "/versions.json");
+		final Map<String, Object> map = this.getResponseAsMap("/projects/" + project + "/versions.json");
 		final List<HashMap<String, Object>> object = (List<HashMap<String, Object>>) map.get("versions");
 		final Version[] versions = this.mapper.convertValue(object, Version[].class);
 		if ((versions != null) && (versions.length != 0)) {
@@ -135,7 +140,7 @@ public class Redmine {
 		return new ArrayList<>();
 	}
 	
-	private HashMap<String, Object> getResponseAsMap(final String url) {
+	private Map<String, Object> getResponseAsMap(final String url) {
 		try {
 			final HttpResponse response = this.createRequest(url).get();
 			final String responseAsString = WS.getResponseAsString(response);
@@ -160,15 +165,15 @@ public class Redmine {
 			final String bodyString = "{\"version\":{\"name\":\"%s\",\"status\":\"closed\",\"due_date\":\"%s\"}}";
 			body = String.format(bodyString, version.getName(), due);
 			final HTTPRequest req = this.createRequest("/versions/" + version.getId() + ".json");
-			req.header(WSConstants.HEADER_CONTENT_TYPE, "application/json");
+			req.header(WSConstants.HEADER_CONTENT_TYPE, Redmine.APPLICATION_JSON);
 			final HttpResponse put = req.body(body).put();
 			if (!WS.isStatusOK(put)) {
 				this.log.error(WS.getResponseAsString(put));
-				throw new RedmineException("Status change failed");
+				throw new RedmineException(Redmine.STATUS_CHANGE_FAILED);
 			}
 		} catch (final Exception e) {
 			this.log.error(e);
-			throw new RedmineException("Status change failed", e);
+			throw new RedmineException(Redmine.STATUS_CHANGE_FAILED, e);
 		}
 	}
 	
@@ -180,15 +185,15 @@ public class Redmine {
 		try {
 			final String body = String.format("{\"version\":{\"name\":\"%s\"}}", newName);
 			final HTTPRequest req = this.createRequest("/versions/" + version.getId() + ".json");
-			req.header(WSConstants.HEADER_CONTENT_TYPE, "application/json");
+			req.header(WSConstants.HEADER_CONTENT_TYPE, Redmine.APPLICATION_JSON);
 			final HttpResponse put = req.body(body).put();
 			if (!WS.isStatusOK(put)) {
 				this.log.error(WS.getResponseAsString(put));
-				throw new RedmineException("Status change failed");
+				throw new RedmineException(Redmine.STATUS_CHANGE_FAILED);
 			}
 		} catch (final Exception e) {
 			this.log.error(e);
-			throw new RedmineException("Status change failed", e);
+			throw new RedmineException(Redmine.STATUS_CHANGE_FAILED, e);
 		}
 	}
 	
@@ -200,15 +205,15 @@ public class Redmine {
 		try {
 			final String body = String.format("{\"version\":{\"name\":\"%s\",\"status\":\"open\"}}", name);
 			final HTTPRequest req = this.createRequest("/projects/" + project + "/versions.json");
-			req.header(WSConstants.HEADER_CONTENT_TYPE, "application/json");
+			req.header(WSConstants.HEADER_CONTENT_TYPE, Redmine.APPLICATION_JSON);
 			final HttpResponse put = req.body(body).post();
 			if (!WS.isStatusOK(put)) {
 				this.log.error(WS.getResponseAsString(put));
-				throw new RedmineException("Status change failed");
+				throw new RedmineException(Redmine.STATUS_CHANGE_FAILED);
 			}
 		} catch (final Exception e) {
 			e.printStackTrace();
-			throw new RedmineException("Status change failed", e);
+			throw new RedmineException(Redmine.STATUS_CHANGE_FAILED, e);
 		}
 	}
 }

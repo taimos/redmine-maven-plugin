@@ -17,7 +17,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
 
@@ -28,7 +27,7 @@ import org.codehaus.jackson.map.JsonDeserializer;
 public class DateDeserializer extends JsonDeserializer<Date> {
 	
 	@Override
-	public Date deserialize(final JsonParser jp, final DeserializationContext ctx) throws IOException, JsonProcessingException {
+	public Date deserialize(final JsonParser jp, final DeserializationContext ctx) throws IOException {
 		final String text = jp.getText();
 		return DateDeserializer.parse(text);
 	}

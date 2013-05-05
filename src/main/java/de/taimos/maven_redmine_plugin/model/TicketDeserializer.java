@@ -15,7 +15,6 @@ import java.io.IOException;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
 
@@ -26,7 +25,7 @@ import org.codehaus.jackson.map.JsonDeserializer;
 public class TicketDeserializer extends JsonDeserializer<Ticket> {
 	
 	@Override
-	public Ticket deserialize(final JsonParser jp, final DeserializationContext ctx) throws IOException, JsonProcessingException {
+	public Ticket deserialize(final JsonParser jp, final DeserializationContext ctx) throws IOException {
 		final JsonNode json = jp.readValueAsTree();
 		
 		final Ticket t = new Ticket();
