@@ -14,22 +14,21 @@ package de.taimos.maven_redmine_plugin;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import de.taimos.maven_redmine_plugin.model.Version;
 
 /**
  * Goal which closes the given version
- * 
- * @goal create-version
  */
+@Mojo(name = "create-version")
 public class CreateVersionMojo extends RedmineMojo {
 	
 	/**
 	 * the version to create
-	 * 
-	 * @parameter expression="${createVersion}" default-value="${project.version}"
-	 * @required
 	 */
+	@Parameter(defaultValue = "${project.version}", property = "createVersion", required = true)
 	private String createVersion;
 	
 	

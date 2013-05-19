@@ -14,30 +14,27 @@ package de.taimos.maven_redmine_plugin;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import de.taimos.maven_redmine_plugin.model.Version;
 
 /**
  * Goal which closes the given version
- * 
- * @goal rename-version
  */
+@Mojo(name = "rename-version")
 public class RenameVersionMojo extends RedmineMojo {
 	
 	/**
 	 * The version to rename
-	 * 
-	 * @parameter expression="${renameVersion}" default-value="${project.version}"
-	 * @required
 	 */
+	@Parameter(defaultValue = "${project.version}", property = "renameVersion", required = true)
 	private String renameVersion;
 	
 	/**
 	 * The new name of the version
-	 * 
-	 * @parameter expression="${newName}" default-value="${project.version}"
-	 * @required
 	 */
+	@Parameter(defaultValue = "${project.version}", property = "newName", required = true)
 	private String newName;
 	
 	

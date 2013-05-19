@@ -14,23 +14,22 @@ package de.taimos.maven_redmine_plugin;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import de.taimos.maven_redmine_plugin.model.Ticket;
 import de.taimos.maven_redmine_plugin.model.Version;
 
 /**
  * Goal which asserts that all issues for given version are closed
- * 
- * @goal assert-closed
  */
+@Mojo(name = "assert-closed")
 public class AssertClosedMojo extends RedmineMojo {
 	
 	/**
 	 * assert version
-	 * 
-	 * @parameter expression="${assertVersion}" default-value="${project.version}"
-	 * @required
 	 */
+	@Parameter(defaultValue = "${project.version}", property = "assertVersion", required = true)
 	private String assertVersion;
 	
 	

@@ -12,22 +12,21 @@ package de.taimos.maven_redmine_plugin;
  */
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import de.taimos.maven_redmine_plugin.model.Version;
 
 /**
  * Goal which prints changelog of current version
- * 
- * @goal print
  */
+@Mojo(name = "print")
 public class PrintChangelogMojo extends AbstractChangelogMojo {
 	
 	/**
 	 * Changelog version
-	 * 
-	 * @parameter expression="${changelogVersion}" default-value="${project.version}"
-	 * @required
 	 */
+	@Parameter(defaultValue = "${project.version}", property = "changelogVersion", required = true)
 	private String changelogVersion;
 	
 	

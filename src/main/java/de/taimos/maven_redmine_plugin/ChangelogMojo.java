@@ -15,30 +15,27 @@ import java.io.File;
 import java.io.FileWriter;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import de.taimos.maven_redmine_plugin.model.Version;
 
 /**
  * Goal which creates changelog file with all closed versions
- * 
- * @goal changelog
  */
+@Mojo(name = "changelog")
 public class ChangelogMojo extends AbstractChangelogMojo {
 	
 	/**
 	 * Changelog file
-	 * 
-	 * @parameter default-value="target/redmine/changelog"
-	 * @required
 	 */
+	@Parameter(defaultValue = "${project.build.directory}/redmine/changelog", required = true)
 	private File changelogFile;
 	
 	/**
 	 * Changelog version
-	 * 
-	 * @parameter expression="${changelogVersion}" default-value="${project.version}"
-	 * @required
 	 */
+	@Parameter(defaultValue = "${project.version}", property = "changelogVersion", required = true)
 	private String changelogVersion;
 	
 	

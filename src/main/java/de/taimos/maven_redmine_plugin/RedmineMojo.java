@@ -26,6 +26,7 @@ package de.taimos.maven_redmine_plugin;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Abstract Mojo Class for Redmine
@@ -36,33 +37,26 @@ public abstract class RedmineMojo extends AbstractMojo {
 	
 	/**
 	 * Redmine url.
-	 * 
-	 * @parameter default-value="${project.issueManagement.url}"
-	 * @required
 	 */
+	@Parameter(defaultValue = "${project.issueManagement.url}", required = true)
 	private String redmineUrl;
 	
 	/**
 	 * API key used to log in redmine.
-	 * 
-	 * @parameter expression="${redmineKey}"
-	 * @required
 	 */
+	@Parameter(property = "redmineKey", required = true)
 	private String redmineKey;
 	
 	/**
 	 * Project identifier.
-	 * 
-	 * @parameter default-value="${project.artifactId}" expression="${projectIdentifier}"
-	 * @required
 	 */
+	@Parameter(defaultValue = "${project.artifactId}", property = "projectIdentifier", required = true)
 	private String projectIdentifier;
 	
 	/**
 	 * Project version prefix.
-	 * 
-	 * @parameter default-value="" expression="${projectVersionPrefix}"
 	 */
+	@Parameter(defaultValue = "", property = "projectVersionPrefix")
 	private String projectVersionPrefix;
 	
 	

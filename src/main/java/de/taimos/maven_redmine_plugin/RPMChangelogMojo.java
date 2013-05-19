@@ -15,37 +15,33 @@ import java.io.File;
 import java.io.FileWriter;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import de.taimos.maven_redmine_plugin.model.Version;
 
 /**
  * Goal which creates changelog file with all closed versions
- * 
- * @goal rpm-changelog
  */
+@Mojo(name = "rpm-changelog")
 public class RPMChangelogMojo extends AbstractChangelogMojo {
 	
 	/**
 	 * Changelog file
-	 * 
-	 * @parameter default-value="target/redmine/rpm-changelog"
-	 * @required
 	 */
+	@Parameter(defaultValue = "${project.build.directory}/redmine/rpm-changelog", required = true)
 	private File rpmChangelogFile;
 	
 	/**
 	 * Changelog author
-	 * 
-	 * @parameter expression="${rpmChangelogAuthor}"
-	 * @required
 	 */
+	@Parameter(property = "rpmChangelogAuthor", required = true)
 	private String rpmChangelogAuthor;
 	
 	/**
 	 * minimal changelog version
-	 * 
-	 * @parameter default-value="0.0.0" expression="${rpmMinimalVersion}"
 	 */
+	@Parameter(defaultValue = "0.0.0", property = "rpmMinimalVersion")
 	private String rpmMinimalVersion;
 	
 	

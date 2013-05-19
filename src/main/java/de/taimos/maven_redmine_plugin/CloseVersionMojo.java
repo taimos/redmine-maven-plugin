@@ -14,22 +14,21 @@ package de.taimos.maven_redmine_plugin;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import de.taimos.maven_redmine_plugin.model.Version;
 
 /**
  * Goal which closes the given version
- * 
- * @goal close-version
  */
+@Mojo(name = "close-version")
 public class CloseVersionMojo extends RedmineMojo {
 	
 	/**
 	 * the version to close
-	 * 
-	 * @parameter expression="${closeVersion}" default-value="${project.version}"
-	 * @required
 	 */
+	@Parameter(defaultValue = "${project.version}", property = "closeVersion", required = true)
 	private String closeVersion;
 	
 	
