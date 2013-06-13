@@ -14,6 +14,7 @@ package de.taimos.maven_redmine_plugin;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -31,7 +32,7 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		
 		final List<Version> versions = this.redmine.getVersions(this.getProjectIdentifier());
 		
-		final SimpleDateFormat sdf = new SimpleDateFormat(this.getDateFormat());
+		final SimpleDateFormat sdf = new SimpleDateFormat(this.getDateFormat(), Locale.US);
 		// Sort versions
 		Collections.sort(versions);
 		// Newest first
