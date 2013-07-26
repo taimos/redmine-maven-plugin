@@ -65,7 +65,7 @@ Find below the possible parameters for the plugin. The string in () is the maven
 	<plugin>
 		<groupId>de.taimos</groupId>
 		<artifactId>redmine-maven-plugin</artifactId>
-		<version>1.6.1</version>
+		<version>1.7.0</version>
 		<configuration>
 			<projectIdentifier>myproject</projectIdentifier>
 			<projectVersionPrefix>myprefix</projectVersionPrefix>
