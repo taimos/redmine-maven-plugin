@@ -11,14 +11,15 @@ package de.taimos.maven_redmine_plugin;
  * and limitations under the License. #L%
  */
 
-import java.io.File;
-import java.io.FileWriter;
-
+import de.taimos.maven_redmine_plugin.model.Version;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.util.IOUtil;
 
-import de.taimos.maven_redmine_plugin.model.Version;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
 /**
  * Goal which creates changelog file with all closed versions
@@ -46,17 +47,19 @@ public class RPMChangelogMojo extends AbstractChangelogMojo {
 	
 	
 	@Override
-	protected String getVersionHeader(final String version, final String date) {
+	protected String getVersionHeader(String version, String date) {
 		return String.format("* %s %s %s \n", date, this.rpmChangelogAuthor, version + "-1");
 	}
 	
 	@Override
-	protected void doChangelog(final String changelog) throws MojoExecutionException {
-		try (FileWriter fw = new FileWriter(this.rpmChangelogFile)) {
+	protected void doChangelog(InputStream changelog) throws MojoExecutionException {
+		try (FileOutputStream outputStream = new FileOutputStream(this.rpmChangelogFile)) {
 			// write changelog to file
-			fw.write(changelog);
-		} catch (final Exception e) {
+			IOUtil.copy(changelog, outputStream);
+		} catch (Exception e) {
 			throw new MojoExecutionException(e.getMessage(), e);
+		} finally {
+			IOUtil.close(changelog);
 		}
 	}
 	
@@ -64,7 +67,7 @@ public class RPMChangelogMojo extends AbstractChangelogMojo {
 	protected void prepareExecute() throws MojoExecutionException {
 		try {
 			this.rpmChangelogFile.getParentFile().mkdirs();
-		} catch (final Exception e) {
+		} catch (Exception e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
 	}
@@ -75,8 +78,8 @@ public class RPMChangelogMojo extends AbstractChangelogMojo {
 	}
 	
 	@Override
-	protected boolean includeVersion(final Version v) {
-		final boolean include = v.getProjectPrefix().equals(this.getProjectVersionPrefix()) && v.getStatus().equals("closed");
+	protected boolean includeVersion(Version v) {
+		boolean include = v.getProjectPrefix().equals(this.getProjectVersionPrefix()) && v.getStatus().equals("closed");
 		if (include) {
 			return v.compareToVersion(this.rpmMinimalVersion) >= 0;
 		}

@@ -11,15 +11,16 @@ package de.taimos.maven_redmine_plugin;
  * and limitations under the License. #L%
  */
 
+import de.taimos.maven_redmine_plugin.model.Ticket;
+import de.taimos.maven_redmine_plugin.model.Version;
+import org.apache.maven.plugin.MojoExecutionException;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-
-import org.apache.maven.plugin.MojoExecutionException;
-
-import de.taimos.maven_redmine_plugin.model.Ticket;
-import de.taimos.maven_redmine_plugin.model.Version;
 
 /**
  * 
@@ -32,14 +33,20 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		
 		final List<Version> versions = this.redmine.getVersions(this.getProjectIdentifier());
 		
-		final SimpleDateFormat sdf = new SimpleDateFormat(this.getDateFormat(), Locale.US);
 		// Sort versions
 		Collections.sort(versions);
 		// Newest first
 		Collections.reverse(versions);
-		
+		// Build input stream
+		InputStream stream = getInputStream(versions);
+
+		this.doChangelog(stream);
+	}
+
+	private InputStream getInputStream(List<Version> versions) throws MojoExecutionException {
 		final StringBuilder changelogText = new StringBuilder();
-		
+		final SimpleDateFormat sdf = new SimpleDateFormat(this.getDateFormat(), Locale.US);
+
 		for (final Version v : versions) {
 			if (this.includeVersion(v)) {
 				final String date = sdf.format(v.getUpdated_on());
@@ -62,13 +69,13 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 				}
 			}
 		}
-		
-		this.doChangelog(changelogText.toString());
+
+		return new ByteArrayInputStream(changelogText.toString().getBytes());
 	}
-	
+
 	protected abstract String getEmptyVersionString();
 	
-	protected abstract void doChangelog(String changelog) throws MojoExecutionException;
+	protected abstract void doChangelog(InputStream changelog) throws MojoExecutionException;
 	
 	/**
 	 * @return the version header as String-format. Parameters are version and date

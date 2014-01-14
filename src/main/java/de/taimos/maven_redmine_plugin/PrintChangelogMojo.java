@@ -11,11 +11,14 @@ package de.taimos.maven_redmine_plugin;
  * and limitations under the License. #L%
  */
 
+import de.taimos.maven_redmine_plugin.model.Version;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.util.IOUtil;
 
-import de.taimos.maven_redmine_plugin.model.Version;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Goal which prints changelog of current version
@@ -31,19 +34,25 @@ public class PrintChangelogMojo extends AbstractChangelogMojo {
 	
 	
 	@Override
-	protected String getVersionHeader(final String version, final String date) {
+	protected String getVersionHeader(String version, String date) {
 		return String.format("Version %s (%s) \n", version, date);
 	}
 	
 	@Override
-	protected boolean includeVersion(final Version v) throws MojoExecutionException {
-		final String version = Version.cleanSnapshot(this.changelogVersion);
+	protected boolean includeVersion(Version v) throws MojoExecutionException {
+		String version = Version.cleanSnapshot(this.changelogVersion);
 		return v.getName().equals(Version.createName(this.getProjectVersionPrefix(), version));
 	}
 	
 	@Override
-	protected void doChangelog(final String changelog) throws MojoExecutionException {
-		this.getLog().info(changelog);
+	protected void doChangelog(InputStream changelog) throws MojoExecutionException {
+		try {
+			this.getLog().info(IOUtil.toString(changelog));
+		} catch (IOException e) {
+			throw new MojoExecutionException(e.getMessage(), e);
+		} finally {
+			IOUtil.close(changelog);
+		}
 	}
 	
 	@Override
