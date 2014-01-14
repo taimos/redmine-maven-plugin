@@ -1,0 +1,14 @@
+<html>
+<head>Simple test template</head>
+<body>
+
+<#list versions as version>
+    ${version}
+    <#assign tickets = tickets[version]/>
+        <#list tickets as ticket>
+            #${ticket.id} - ${ticket.subject}
+        </#list>
+</#list>
+
+</body>
+</html>

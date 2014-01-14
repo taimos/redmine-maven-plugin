@@ -13,6 +13,7 @@ package de.taimos.maven_redmine_plugin;
 
 import de.taimos.maven_redmine_plugin.model.Ticket;
 import de.taimos.maven_redmine_plugin.model.Version;
+import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -83,19 +84,37 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		return ticketsMap;
 	}
 
-	private List<InputStream> buildTemplates(Map<Version, List<Ticket>> ticketsMap, List<String> templates) throws MojoExecutionException {
+	protected List<InputStream> buildTemplates(Map<Version, List<Ticket>> ticketsMap, List<String> templates) throws MojoExecutionException {
+		Map<String, Reader> readers = new LinkedHashMap<>();
+		for (String template : templates) {
+			try {
+				readers.put(template, new FileReader(template));
+			} catch (FileNotFoundException e) {
+				throw new MojoExecutionException(e.getMessage(), e);
+			}
+		}
+
+		return buildTemplatesFromReaders(ticketsMap, readers);
+	}
+
+	protected List<InputStream> buildTemplatesFromReaders(Map<Version, List<Ticket>> ticketsMap, Map<String, Reader> templateReaders) throws MojoExecutionException {
 		Configuration cfg = new Configuration();
 
 		cfg.setDefaultEncoding("UTF-8");
 		cfg.setLocale(Locale.US);
 		cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+		BeansWrapper wrapper = new BeansWrapper();
+		wrapper.setSimpleMapWrapper(true);
+		cfg.setObjectWrapper(wrapper);
+
+		Map<Object, Object> model = buildModel(ticketsMap);
 
 		List<InputStream> result = new ArrayList<>();
-		for (String templatePath : templates) {
+		for (String templateName : templateReaders.keySet()) {
 			try {
-				Template template = new Template(templatePath, new FileReader(templatePath), cfg);
+				Template template = new Template(templateName, templateReaders.get(templateName), cfg);
 				StringWriter writer = new StringWriter();
-				template.process(ticketsMap, writer);
+				template.process(model, writer);
 				result.add(new ByteArrayInputStream(writer.toString().getBytes()));
 			} catch (TemplateException | IOException e) {
 				throw new MojoExecutionException(e.getMessage(), e);
@@ -103,6 +122,20 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		}
 
 		return result;
+	}
+
+	private Map<Object, Object> buildModel(Map<Version, List<Ticket>> ticketsMap) {
+		Map<Object, Object> model = new HashMap<>();
+		model.put("versions", ticketsMap.keySet());
+
+		// freemarker can't work with non string keys
+		Map<String, List<Ticket>> stringKeyMap = new HashMap<>();
+		for (Version version : ticketsMap.keySet()) {
+			stringKeyMap.put(version.toString(), ticketsMap.get(version));
+		}
+		model.put("tickets", stringKeyMap);
+
+		return model;
 	}
 
 	private InputStream buildBasicString(Map<Version, List<Ticket>> ticketsMap) throws MojoExecutionException {
