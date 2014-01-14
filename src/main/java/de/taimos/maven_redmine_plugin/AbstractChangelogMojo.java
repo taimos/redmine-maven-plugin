@@ -18,9 +18,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * 
@@ -31,7 +29,7 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 	protected void doExecute() throws MojoExecutionException {
 		this.prepareExecute();
 		
-		final List<Version> versions = this.redmine.getVersions(this.getProjectIdentifier());
+		List<Version> versions = this.redmine.getVersions(this.getProjectIdentifier());
 		
 		// Sort versions
 		Collections.sort(versions);
@@ -44,14 +42,39 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 	}
 
 	private InputStream getInputStream(List<Version> versions) throws MojoExecutionException {
-		final StringBuilder changelogText = new StringBuilder();
-		final SimpleDateFormat sdf = new SimpleDateFormat(this.getDateFormat(), Locale.US);
+		Map<Version, List<Ticket>> ticketsMap = buildTicketsMap(versions);
+		return buildBasicString(ticketsMap);
+	}
 
-		for (final Version v : versions) {
+	private Map<Version, List<Ticket>> buildTicketsMap(List<Version> versions) throws MojoExecutionException {
+		Map<Version, List<Ticket>> ticketsMap = new LinkedHashMap<>();
+
+		for (Version v : versions) {
 			if (this.includeVersion(v)) {
-				final String date = sdf.format(v.getUpdated_on());
+				List<Ticket> tickets = this.redmine.getClosedTickets(this.getProjectIdentifier(), v.getId());
+				if (!tickets.isEmpty()) {
+					Collections.sort(tickets);
+				}
+
+				ticketsMap.put(v, tickets);
+			}
+		}
+
+		return ticketsMap;
+	}
+
+	private InputStream buildBasicString(Map<Version, List<Ticket>> ticketsMap) throws MojoExecutionException {
+		Set<Version> versions = ticketsMap.keySet();
+		StringBuilder changelogText = new StringBuilder();
+		SimpleDateFormat sdf = new SimpleDateFormat(this.getDateFormat(), Locale.US);
+
+
+		for (Version v : versions) {
+			if (this.includeVersion(v)) {
+				String date = sdf.format(v.getUpdated_on());
 				changelogText.append(this.getVersionHeader(v.toVersionString(), date));
-				final List<Ticket> tickets = this.redmine.getClosedTickets(this.getProjectIdentifier(), v.getId());
+				List<Ticket> tickets = ticketsMap.get(v);
+
 				if (tickets.isEmpty()) {
 					this.getLog().warn("No tickets found for version: " + v.toVersionString());
 					String empty = this.getEmptyVersionString();
@@ -59,8 +82,7 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 						changelogText.append(empty);
 					}
 				} else {
-					Collections.sort(tickets);
-					for (final Ticket ticket : tickets) {
+					for (Ticket ticket : tickets) {
 						changelogText.append("- ");
 						changelogText.append(ticket.toString());
 						changelogText.append('\n');
