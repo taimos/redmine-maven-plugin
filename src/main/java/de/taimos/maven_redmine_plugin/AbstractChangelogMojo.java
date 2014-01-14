@@ -14,6 +14,8 @@ package de.taimos.maven_redmine_plugin;
 import de.taimos.maven_redmine_plugin.model.Ticket;
 import de.taimos.maven_redmine_plugin.model.Version;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -24,6 +26,12 @@ import java.util.*;
  * 
  */
 public abstract class AbstractChangelogMojo extends RedmineMojo {
+
+	/**
+	 * Changelog templates
+	 */
+	@Parameter(defaultValue = "", property = "changelogTemplates", required = false)
+	private String changelogTemplates;
 	
 	@Override
 	protected void doExecute() throws MojoExecutionException {
@@ -43,7 +51,9 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 
 	private InputStream getInputStream(List<Version> versions) throws MojoExecutionException {
 		Map<Version, List<Ticket>> ticketsMap = buildTicketsMap(versions);
-		return buildBasicString(ticketsMap);
+		List<String> templates = getChangelogTemplates();
+		return templates.isEmpty() ?
+				buildBasicString(ticketsMap) : buildTemplates(ticketsMap, templates);
 	}
 
 	private Map<Version, List<Ticket>> buildTicketsMap(List<Version> versions) throws MojoExecutionException {
@@ -61,6 +71,10 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		}
 
 		return ticketsMap;
+	}
+
+	private InputStream buildTemplates(Map<Version, List<Ticket>> ticketsMap, List<String> templates) {
+		return null;
 	}
 
 	private InputStream buildBasicString(Map<Version, List<Ticket>> ticketsMap) throws MojoExecutionException {
@@ -114,5 +128,10 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 	protected void prepareExecute() throws MojoExecutionException {
 		//
 	}
-	
+
+	protected List<String> getChangelogTemplates() {
+		return StringUtils.isEmpty(changelogTemplates) ?
+				Collections.<String>emptyList() :
+				Arrays.asList(StringUtils.split(changelogTemplates, ","));
+	}
 }
