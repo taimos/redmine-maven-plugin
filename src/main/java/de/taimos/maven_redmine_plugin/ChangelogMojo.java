@@ -58,8 +58,6 @@ public class ChangelogMojo extends AbstractChangelogMojo {
 			IOUtil.copy(changelog, outputStream);
 		} catch (Exception e) {
 			throw new MojoExecutionException(e.getMessage(), e);
-		} finally {
-			IOUtil.close(changelog);
 		}
 	}
 	

@@ -50,8 +50,6 @@ public class PrintChangelogMojo extends AbstractChangelogMojo {
 			this.getLog().info(IOUtil.toString(changelog));
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage(), e);
-		} finally {
-			IOUtil.close(changelog);
 		}
 	}
 	

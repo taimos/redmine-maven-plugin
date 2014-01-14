@@ -13,12 +13,16 @@ package de.taimos.maven_redmine_plugin;
 
 import de.taimos.maven_redmine_plugin.model.Ticket;
 import de.taimos.maven_redmine_plugin.model.Version;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -44,16 +48,22 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		// Newest first
 		Collections.reverse(versions);
 		// Build input stream
-		InputStream stream = getInputStream(versions);
+		List<InputStream> streams = getInputStreams(versions);
 
-		this.doChangelog(stream);
+		for (InputStream stream : streams) {
+			try {
+				this.doChangelog(stream);
+			} finally {
+				IOUtil.close(stream);
+			}
+		}
 	}
 
-	private InputStream getInputStream(List<Version> versions) throws MojoExecutionException {
+	private List<InputStream> getInputStreams(List<Version> versions) throws MojoExecutionException {
 		Map<Version, List<Ticket>> ticketsMap = buildTicketsMap(versions);
 		List<String> templates = getChangelogTemplates();
 		return templates.isEmpty() ?
-				buildBasicString(ticketsMap) : buildTemplates(ticketsMap, templates);
+				Arrays.asList(buildBasicString(ticketsMap)) : buildTemplates(ticketsMap, templates);
 	}
 
 	private Map<Version, List<Ticket>> buildTicketsMap(List<Version> versions) throws MojoExecutionException {
@@ -73,8 +83,26 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		return ticketsMap;
 	}
 
-	private InputStream buildTemplates(Map<Version, List<Ticket>> ticketsMap, List<String> templates) {
-		return null;
+	private List<InputStream> buildTemplates(Map<Version, List<Ticket>> ticketsMap, List<String> templates) throws MojoExecutionException {
+		Configuration cfg = new Configuration();
+
+		cfg.setDefaultEncoding("UTF-8");
+		cfg.setLocale(Locale.US);
+		cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+
+		List<InputStream> result = new ArrayList<>();
+		for (String templatePath : templates) {
+			try {
+				Template template = new Template(templatePath, new FileReader(templatePath), cfg);
+				StringWriter writer = new StringWriter();
+				template.process(ticketsMap, writer);
+				result.add(new ByteArrayInputStream(writer.toString().getBytes()));
+			} catch (TemplateException | IOException e) {
+				throw new MojoExecutionException(e.getMessage(), e);
+			}
+		}
+
+		return result;
 	}
 
 	private InputStream buildBasicString(Map<Version, List<Ticket>> ticketsMap) throws MojoExecutionException {
