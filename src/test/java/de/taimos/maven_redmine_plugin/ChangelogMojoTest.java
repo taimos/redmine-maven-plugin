@@ -1,10 +1,8 @@
 package de.taimos.maven_redmine_plugin;
 
-import com.google.common.collect.ImmutableMap;
 import de.taimos.maven_redmine_plugin.model.Ticket;
 import de.taimos.maven_redmine_plugin.model.Version;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -12,7 +10,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.*;
 
 /**
@@ -31,13 +28,9 @@ public class ChangelogMojoTest {
 		Assert.assertNotNull(stream);
 
 		InputStreamReader reader = new InputStreamReader(stream);
-		ImmutableMap<String, Reader> readers = ImmutableMap.<String, Reader>of("template", reader);
 
-		List<InputStream> streams = mojo.buildTemplatesFromReaders(ticketsMap, readers);
-
-		Assert.assertNotNull(streams);
-		Assert.assertEquals(1, streams.size());
-		System.out.println(IOUtil.toString(streams.get(0)));
+		InputStream templateStream = mojo.buildTemplate(ticketsMap, "template", reader);
+		Assert.assertNotNull(templateStream);
 	}
 
 	private Map<Version, List<Ticket>> getTestData() {

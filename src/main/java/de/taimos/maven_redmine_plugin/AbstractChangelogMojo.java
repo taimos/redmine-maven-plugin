@@ -35,8 +35,8 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 	/**
 	 * Changelog templates
 	 */
-	@Parameter(defaultValue = "", property = "changelogTemplates", required = false)
-	private String changelogTemplates;
+	@Parameter(defaultValue = "", property = "changelogTemplate", required = false)
+	private String changelogTemplate;
 	
 	@Override
 	protected void doExecute() throws MojoExecutionException {
@@ -49,22 +49,24 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		// Newest first
 		Collections.reverse(versions);
 		// Build input stream
-		List<InputStream> streams = getInputStreams(versions);
+		InputStream stream = getInputStream(versions);
 
-		for (InputStream stream : streams) {
-			try {
-				this.doChangelog(stream);
-			} finally {
-				IOUtil.close(stream);
-			}
+		try {
+			this.doChangelog(stream);
+		} finally {
+			IOUtil.close(stream);
 		}
 	}
 
-	private List<InputStream> getInputStreams(List<Version> versions) throws MojoExecutionException {
+	private InputStream getInputStream(List<Version> versions) throws MojoExecutionException {
 		Map<Version, List<Ticket>> ticketsMap = buildTicketsMap(versions);
-		List<String> templates = getChangelogTemplates();
-		return templates.isEmpty() ?
-				Arrays.asList(buildBasicString(ticketsMap)) : buildTemplates(ticketsMap, templates);
+		String template = getChangelogTemplate();
+		try {
+			FileReader reader = new FileReader(template);
+			return template.isEmpty() ? buildBasicString(ticketsMap) : buildTemplate(ticketsMap, template, reader);
+		} catch (FileNotFoundException e) {
+			throw new MojoExecutionException(e.getMessage(), e);
+		}
 	}
 
 	private Map<Version, List<Ticket>> buildTicketsMap(List<Version> versions) throws MojoExecutionException {
@@ -84,20 +86,7 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		return ticketsMap;
 	}
 
-	protected List<InputStream> buildTemplates(Map<Version, List<Ticket>> ticketsMap, List<String> templates) throws MojoExecutionException {
-		Map<String, Reader> readers = new LinkedHashMap<>();
-		for (String template : templates) {
-			try {
-				readers.put(template, new FileReader(template));
-			} catch (FileNotFoundException e) {
-				throw new MojoExecutionException(e.getMessage(), e);
-			}
-		}
-
-		return buildTemplatesFromReaders(ticketsMap, readers);
-	}
-
-	protected List<InputStream> buildTemplatesFromReaders(Map<Version, List<Ticket>> ticketsMap, Map<String, Reader> templateReaders) throws MojoExecutionException {
+	protected InputStream buildTemplate(Map<Version, List<Ticket>> ticketsMap, String templateName, Reader reader) throws MojoExecutionException {
 		Configuration cfg = new Configuration();
 
 		cfg.setDefaultEncoding("UTF-8");
@@ -109,19 +98,14 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 
 		Map<Object, Object> model = buildModel(ticketsMap);
 
-		List<InputStream> result = new ArrayList<>();
-		for (String templateName : templateReaders.keySet()) {
-			try {
-				Template template = new Template(templateName, templateReaders.get(templateName), cfg);
-				StringWriter writer = new StringWriter();
-				template.process(model, writer);
-				result.add(new ByteArrayInputStream(writer.toString().getBytes()));
-			} catch (TemplateException | IOException e) {
-				throw new MojoExecutionException(e.getMessage(), e);
-			}
+		try {
+			Template template = new Template(templateName, reader, cfg);
+			StringWriter writer = new StringWriter();
+			template.process(model, writer);
+			return new ByteArrayInputStream(writer.toString().getBytes());
+		} catch (TemplateException | IOException e) {
+			throw new MojoExecutionException(e.getMessage(), e);
 		}
-
-		return result;
 	}
 
 	private Map<Object, Object> buildModel(Map<Version, List<Ticket>> ticketsMap) {
@@ -190,9 +174,7 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		//
 	}
 
-	protected List<String> getChangelogTemplates() {
-		return StringUtils.isEmpty(changelogTemplates) ?
-				Collections.<String>emptyList() :
-				Arrays.asList(StringUtils.split(changelogTemplates, ","));
+	protected String getChangelogTemplate() {
+		return StringUtils.isNotEmpty(changelogTemplate) ? changelogTemplate : null;
 	}
 }
