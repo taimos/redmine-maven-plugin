@@ -3,10 +3,12 @@ package de.taimos.maven_redmine_plugin;
 import de.taimos.maven_redmine_plugin.model.Ticket;
 import de.taimos.maven_redmine_plugin.model.Version;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.codehaus.plexus.util.IOUtil;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,13 +26,15 @@ public class ChangelogMojoTest {
 		ChangelogMojo mojo = new ChangelogMojo();
 		Map<Version, List<Ticket>> ticketsMap = getTestData();
 
-		InputStream stream = ChangelogMojoTest.class.getResourceAsStream("/template.html");
+		InputStream stream = ChangelogMojoTest.class.getResourceAsStream("/feed.rss");
 		Assert.assertNotNull(stream);
 
 		InputStreamReader reader = new InputStreamReader(stream);
 
 		InputStream templateStream = mojo.buildTemplate(ticketsMap, "template", reader);
 		Assert.assertNotNull(templateStream);
+
+		IOUtil.copy(templateStream, new FileOutputStream("/tmp/feed.rss"));
 	}
 
 	private Map<Version, List<Ticket>> getTestData() {
@@ -46,11 +50,13 @@ public class ChangelogMojoTest {
 		firstTicket1.setId(101);
 		firstTicket1.setSubject("First ticket");
 		firstTicket1.setDescription("First ticket description");
+		firstTicket1.setCreated(new Date());
 
 		Ticket firstTicket2 = new Ticket();
 		firstTicket2.setId(102);
 		firstTicket2.setSubject("Second ticket");
 		firstTicket2.setDescription("Second ticket description");
+		firstTicket2.setCreated(new Date());
 
 		ticketsMap.put(firstVersion, Arrays.asList(firstTicket1, firstTicket2));
 		return ticketsMap;

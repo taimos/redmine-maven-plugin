@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+
+<channel>
+  <title>Redmine</title>
+  <link>http://www.redmine.com</link>
+  <description>Redmine maven plugin rss feed example</description>
+  <#list versions as version>
+  <#assign tickets = tickets[version]/>
+  <#list tickets as ticket>
+  <item>
+    <pubDate>${ticket.created?date}</pubDate>
+    <link>http://redmine.com</link>
+    <title>${ticket.subject}</title>
+    <description>${ticket.description}</description>
+  </item>
+  </#list>
+  </#list>
+</channel>
+</rss>
