@@ -36,16 +36,19 @@ Find below the possible parameters for the plugin. The string in () is the maven
 
 * _changelogFile_ The target file () [target/redmine/changelog]
 * _changelogVersion_ The version to print changelog for (changelogVersion) [${project.version}]
+* _changelogTemplate_ The freemarker template file for generated changelog []
 
 ### rpm-changelog
 
 * _rpmChangelogFile_ The target file () [target/redmine/rpm-changelog]
 * _rpmChangelogAuthor_ The author in RPM format (rpmChangelogAuthor) []
 * _rpmMinimalVersion_ The version to start changelog with (rpmMinimalVersion) [0.0.0]
+* _changelogTemplate_ The freemarker template file for generated changelog []
 
 ### print
 
 * _changelogVersion_ The version to print changelog for (changelogVersion) [${project.version}]
+* _changelogTemplate_ The freemarker template file for generated changelog []
 
 ### close-version
 * _closeVersion_ The version to close (closeVersion) [${project.version}]
