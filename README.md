@@ -79,3 +79,31 @@ Find below the possible parameters for the plugin. The string in () is the maven
 		</configuration>
 	</plugin>
 
+### _changelogTemplate_ usage example
+
+For example, if _changelogTemplate_ variable specifies path to file with the following content:
+
+    <html>
+    <head>Simple test template</head>
+    <body>
+    <#list versions as version>
+        ${version}
+        <#assign tickets = tickets[version]/>
+            <#list tickets as ticket>
+                #${ticket.id} - ${ticket.subject}
+            </#list>
+    </#list>
+    </body>
+    </html>
+
+After executing maven goal _redmine:changelog_ the output file _changelog_ will be look like this:
+
+    <html>
+    <head>Simple test template</head>
+    <body>
+        Version [description=Test version, name=TEST, status=READY]
+                #101 - First ticket
+                #102 - Second ticket
+    </body>
+    </html>
+
