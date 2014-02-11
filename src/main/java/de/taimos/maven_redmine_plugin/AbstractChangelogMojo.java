@@ -41,15 +41,15 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 	@Override
 	protected void doExecute() throws MojoExecutionException {
 		this.prepareExecute();
-		
-		List<Version> versions = this.redmine.getVersions(this.getProjectIdentifier());
+
+		final List<Version> versions = this.redmine.getVersions(this.getProjectIdentifier());
 		
 		// Sort versions
 		Collections.sort(versions);
 		// Newest first
 		Collections.reverse(versions);
 		// Build input stream
-		InputStream stream = getInputStream(versions);
+		final InputStream stream = getInputStream(versions);
 
 		try {
 			this.doChangelog(stream);
@@ -58,7 +58,7 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		}
 	}
 
-	private InputStream getInputStream(List<Version> versions) throws MojoExecutionException {
+	private InputStream getInputStream(final List<Version> versions) throws MojoExecutionException {
 		Map<Version, List<Ticket>> ticketsMap = buildTicketsMap(versions);
 		String template = getChangelogTemplate();
 		try {
@@ -69,8 +69,8 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		}
 	}
 
-	private Map<Version, List<Ticket>> buildTicketsMap(List<Version> versions) throws MojoExecutionException {
-		Map<Version, List<Ticket>> ticketsMap = new LinkedHashMap<>();
+	private Map<Version, List<Ticket>> buildTicketsMap(final List<Version> versions) throws MojoExecutionException {
+		final Map<Version, List<Ticket>> ticketsMap = new LinkedHashMap<>();
 
 		for (Version v : versions) {
 			if (this.includeVersion(v)) {
@@ -86,7 +86,7 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		return ticketsMap;
 	}
 
-	protected InputStream buildTemplate(Map<Version, List<Ticket>> ticketsMap, String templateName, Reader reader) throws MojoExecutionException {
+	protected InputStream buildTemplate(final Map<Version, List<Ticket>> ticketsMap, final String templateName, final Reader reader) throws MojoExecutionException {
 		Configuration cfg = new Configuration();
 
 		cfg.setDefaultEncoding("UTF-8");
@@ -108,7 +108,7 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		}
 	}
 
-	private Map<Object, Object> buildModel(Map<Version, List<Ticket>> ticketsMap) {
+	private Map<Object, Object> buildModel(final Map<Version, List<Ticket>> ticketsMap) {
 		Map<Object, Object> model = new HashMap<>();
 		model.put("versions", ticketsMap.keySet());
 
@@ -122,11 +122,10 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		return model;
 	}
 
-	private InputStream buildBasicString(Map<Version, List<Ticket>> ticketsMap) throws MojoExecutionException {
-		Set<Version> versions = ticketsMap.keySet();
-		StringBuilder changelogText = new StringBuilder();
-		SimpleDateFormat sdf = new SimpleDateFormat(this.getDateFormat(), Locale.US);
-
+	private InputStream buildBasicString(final Map<Version, List<Ticket>> ticketsMap) throws MojoExecutionException {
+		final Set<Version> versions = ticketsMap.keySet();
+		final StringBuilder changelogText = new StringBuilder();
+		final SimpleDateFormat sdf = new SimpleDateFormat(this.getDateFormat(), Locale.US);
 
 		for (Version v : versions) {
 			if (this.includeVersion(v)) {
@@ -156,14 +155,14 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 
 	protected abstract String getEmptyVersionString();
 	
-	protected abstract void doChangelog(InputStream changelog) throws MojoExecutionException;
+	protected abstract void doChangelog(final InputStream changelog) throws MojoExecutionException;
 	
 	/**
 	 * @return the version header as String-format. Parameters are version and date
 	 */
-	protected abstract String getVersionHeader(String version, String date);
+	protected abstract String getVersionHeader(final String version, final String date);
 	
-	protected abstract boolean includeVersion(Version v) throws MojoExecutionException;
+	protected abstract boolean includeVersion(final Version v) throws MojoExecutionException;
 	
 	protected String getDateFormat() {
 		return "MMM dd yyyy";

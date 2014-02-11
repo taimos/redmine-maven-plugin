@@ -41,22 +41,22 @@ public class ChangelogMojo extends AbstractChangelogMojo {
 	
 	
 	@Override
-	protected String getVersionHeader(String version, String date) {
+	protected String getVersionHeader(final String version, final String date) {
 		return String.format("Version %s (%s) \n", version, date);
 	}
 	
 	@Override
-	protected boolean includeVersion(Version v) throws MojoExecutionException {
+	protected boolean includeVersion(final Version v) throws MojoExecutionException {
 		String version = Version.cleanSnapshot(this.changelogVersion);
 		return v.getName().equals(Version.createName(this.getProjectVersionPrefix(), version));
 	}
 	
 	@Override
-	protected void doChangelog(InputStream changelog) throws MojoExecutionException {
+	protected void doChangelog(final InputStream changelog) throws MojoExecutionException {
 		try (FileOutputStream outputStream = new FileOutputStream(this.changelogFile)) {
 			// write changelog to file
 			IOUtil.copy(changelog, outputStream);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
 	}
@@ -65,7 +65,7 @@ public class ChangelogMojo extends AbstractChangelogMojo {
 	protected void prepareExecute() throws MojoExecutionException {
 		try {
 			this.changelogFile.getParentFile().mkdirs();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
 	}

@@ -47,16 +47,16 @@ public class RPMChangelogMojo extends AbstractChangelogMojo {
 	
 	
 	@Override
-	protected String getVersionHeader(String version, String date) {
+	protected String getVersionHeader(final String version, final String date) {
 		return String.format("* %s %s %s \n", date, this.rpmChangelogAuthor, version + "-1");
 	}
 	
 	@Override
-	protected void doChangelog(InputStream changelog) throws MojoExecutionException {
+	protected void doChangelog(final InputStream changelog) throws MojoExecutionException {
 		try (FileOutputStream outputStream = new FileOutputStream(this.rpmChangelogFile)) {
 			// write changelog to file
 			IOUtil.copy(changelog, outputStream);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
 	}
@@ -65,7 +65,7 @@ public class RPMChangelogMojo extends AbstractChangelogMojo {
 	protected void prepareExecute() throws MojoExecutionException {
 		try {
 			this.rpmChangelogFile.getParentFile().mkdirs();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
 	}
@@ -76,7 +76,7 @@ public class RPMChangelogMojo extends AbstractChangelogMojo {
 	}
 	
 	@Override
-	protected boolean includeVersion(Version v) {
+	protected boolean includeVersion(final Version v) {
 		boolean include = v.getProjectPrefix().equals(this.getProjectVersionPrefix()) && v.getStatus().equals("closed");
 		if (include) {
 			return v.compareToVersion(this.rpmMinimalVersion) >= 0;
