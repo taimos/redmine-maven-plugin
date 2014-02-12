@@ -36,16 +36,19 @@ Find below the possible parameters for the plugin. The string in () is the maven
 
 * _changelogFile_ The target file () [target/redmine/changelog]
 * _changelogVersion_ The version to print changelog for (changelogVersion) [${project.version}]
+* _changelogTemplate_ The freemarker template file for generated changelog []
 
 ### rpm-changelog
 
 * _rpmChangelogFile_ The target file () [target/redmine/rpm-changelog]
 * _rpmChangelogAuthor_ The author in RPM format (rpmChangelogAuthor) []
 * _rpmMinimalVersion_ The version to start changelog with (rpmMinimalVersion) [0.0.0]
+* _changelogTemplate_ The freemarker template file for generated changelog []
 
 ### print
 
 * _changelogVersion_ The version to print changelog for (changelogVersion) [${project.version}]
+* _changelogTemplate_ The freemarker template file for generated changelog []
 
 ### close-version
 * _closeVersion_ The version to close (closeVersion) [${project.version}]
@@ -75,4 +78,32 @@ Find below the possible parameters for the plugin. The string in () is the maven
 			<rpmChangelogAuthor>John Doe &lt;john@doe.com&gt;</rpmChangelogAuthor>
 		</configuration>
 	</plugin>
+
+### _changelogTemplate_ usage example
+
+For example, if _changelogTemplate_ variable specifies path to file with the following content:
+
+    <html>
+    <head>Simple test template</head>
+    <body>
+    <#list versions as version>
+        ${version}
+        <#assign tickets = tickets[version]/>
+            <#list tickets as ticket>
+                #${ticket.id} - ${ticket.subject}
+            </#list>
+    </#list>
+    </body>
+    </html>
+
+After executing maven goal _redmine:changelog_ the output file _changelog_ will be look like this:
+
+    <html>
+    <head>Simple test template</head>
+    <body>
+        Version [description=Test version, name=TEST, status=READY]
+                #101 - First ticket
+                #102 - Second ticket
+    </body>
+    </html>
 

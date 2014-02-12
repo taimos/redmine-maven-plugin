@@ -11,14 +11,15 @@ package de.taimos.maven_redmine_plugin;
  * and limitations under the License. #L%
  */
 
-import java.io.File;
-import java.io.FileWriter;
-
+import de.taimos.maven_redmine_plugin.model.Version;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.util.IOUtil;
 
-import de.taimos.maven_redmine_plugin.model.Version;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
 /**
  * Goal which creates changelog file with all closed versions
@@ -46,15 +47,15 @@ public class ChangelogMojo extends AbstractChangelogMojo {
 	
 	@Override
 	protected boolean includeVersion(final Version v) throws MojoExecutionException {
-		final String version = Version.cleanSnapshot(this.changelogVersion);
+		String version = Version.cleanSnapshot(this.changelogVersion);
 		return v.getName().equals(Version.createName(this.getProjectVersionPrefix(), version));
 	}
 	
 	@Override
-	protected void doChangelog(final String changelog) throws MojoExecutionException {
-		try (FileWriter fw = new FileWriter(this.changelogFile)) {
+	protected void doChangelog(final InputStream changelog) throws MojoExecutionException {
+		try (FileOutputStream outputStream = new FileOutputStream(this.changelogFile)) {
 			// write changelog to file
-			fw.write(changelog);
+			IOUtil.copy(changelog, outputStream);
 		} catch (final Exception e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}

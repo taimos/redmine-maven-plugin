@@ -11,14 +11,15 @@ package de.taimos.maven_redmine_plugin;
  * and limitations under the License. #L%
  */
 
-import java.io.File;
-import java.io.FileWriter;
-
+import de.taimos.maven_redmine_plugin.model.Version;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.util.IOUtil;
 
-import de.taimos.maven_redmine_plugin.model.Version;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
 /**
  * Goal which creates changelog file with all closed versions
@@ -51,10 +52,10 @@ public class RPMChangelogMojo extends AbstractChangelogMojo {
 	}
 	
 	@Override
-	protected void doChangelog(final String changelog) throws MojoExecutionException {
-		try (FileWriter fw = new FileWriter(this.rpmChangelogFile)) {
+	protected void doChangelog(final InputStream changelog) throws MojoExecutionException {
+		try (FileOutputStream outputStream = new FileOutputStream(this.rpmChangelogFile)) {
 			// write changelog to file
-			fw.write(changelog);
+			IOUtil.copy(changelog, outputStream);
 		} catch (final Exception e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
@@ -76,7 +77,7 @@ public class RPMChangelogMojo extends AbstractChangelogMojo {
 	
 	@Override
 	protected boolean includeVersion(final Version v) {
-		final boolean include = v.getProjectPrefix().equals(this.getProjectVersionPrefix()) && v.getStatus().equals("closed");
+		boolean include = v.getProjectPrefix().equals(this.getProjectVersionPrefix()) && v.getStatus().equals("closed");
 		if (include) {
 			return v.compareToVersion(this.rpmMinimalVersion) >= 0;
 		}
