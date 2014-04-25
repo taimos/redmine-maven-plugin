@@ -13,10 +13,10 @@ package de.taimos.maven_redmine_plugin.model;
 
 import java.io.IOException;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.JsonDeserializer;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author hoegertn
@@ -29,22 +29,22 @@ public class TicketDeserializer extends JsonDeserializer<Ticket> {
 		final JsonNode json = jp.readValueAsTree();
 		
 		final Ticket t = new Ticket();
-		t.setId(json.get("id").getIntValue());
-		t.setSubject(json.get("subject").getTextValue());
+		t.setId(json.get("id").asInt());
+		t.setSubject(json.get("subject").asText());
 		t.setTracker(TicketDeserializer.getNestedName(json, "tracker"));
 		t.setAssignee(TicketDeserializer.getNestedName(json, "assigned_to"));
 		t.setAuthor(TicketDeserializer.getNestedName(json, "author"));
 		if (json.has("created_on")) {
-			t.setCreated(DateDeserializer.parse(json.get("created_on").getTextValue()));
+			t.setCreated(DateDeserializer.parse(json.get("created_on").asText()));
 		}
 		if (json.has("start_date")) {
-			t.setStartDate(DateDeserializer.parse(json.get("start_date").getTextValue()));
+			t.setStartDate(DateDeserializer.parse(json.get("start_date").asText()));
 		}
 		if (json.has("updated_on")) {
-			t.setUpdated(DateDeserializer.parse(json.get("updated_on").getTextValue()));
+			t.setUpdated(DateDeserializer.parse(json.get("updated_on").asText()));
 		}
 		if (json.has("description")) {
-			t.setDescription(json.get("description").getTextValue());
+			t.setDescription(json.get("description").asText());
 		}
 		t.setFixedVersion(TicketDeserializer.getNestedName(json, "fixed_version"));
 		t.setPriority(TicketDeserializer.getNestedName(json, "priority"));
@@ -55,7 +55,7 @@ public class TicketDeserializer extends JsonDeserializer<Ticket> {
 	
 	private static String getNestedName(final JsonNode json, final String field) {
 		if (json.has(field) && json.get(field).has("name")) {
-			return json.get(field).get("name").getTextValue();
+			return json.get(field).get("name").asText();
 		}
 		return null;
 	}

@@ -1,18 +1,23 @@
 package de.taimos.maven_redmine_plugin;
 
-import de.taimos.maven_redmine_plugin.model.Ticket;
-import de.taimos.maven_redmine_plugin.model.Version;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.*;
+import de.taimos.maven_redmine_plugin.model.Ticket;
+import de.taimos.maven_redmine_plugin.model.Version;
 
 /**
  * @author Alexandr Kolosov
@@ -20,23 +25,23 @@ import java.util.*;
  */
 @Ignore
 public class ChangelogMojoTest {
-
+	
 	@Test
 	public void testTemplateBuild() throws MojoExecutionException, IOException {
 		ChangelogMojo mojo = new ChangelogMojo();
-		Map<Version, List<Ticket>> ticketsMap = getTestData();
-
+		Map<Version, List<Ticket>> ticketsMap = this.getTestData();
+		
 		InputStream stream = ChangelogMojoTest.class.getResourceAsStream("/feed.rss");
 		Assert.assertNotNull(stream);
-
+		
 		InputStreamReader reader = new InputStreamReader(stream);
-
+		
 		InputStream templateStream = mojo.buildTemplate(ticketsMap, "template", reader);
 		Assert.assertNotNull(templateStream);
-
+		
 		IOUtil.copy(templateStream, new FileOutputStream("/tmp/feed.rss"));
 	}
-
+	
 	private Map<Version, List<Ticket>> getTestData() {
 		Map<Version, List<Ticket>> ticketsMap = new LinkedHashMap<>();
 		Version firstVersion = new Version();
@@ -45,19 +50,19 @@ public class ChangelogMojoTest {
 		firstVersion.setName("TEST");
 		firstVersion.setDescription("Test version");
 		firstVersion.setStatus("READY");
-
+		
 		Ticket firstTicket1 = new Ticket();
 		firstTicket1.setId(101);
 		firstTicket1.setSubject("First ticket");
 		firstTicket1.setDescription("First ticket description");
 		firstTicket1.setCreated(new Date());
-
+		
 		Ticket firstTicket2 = new Ticket();
 		firstTicket2.setId(102);
 		firstTicket2.setSubject("Second ticket");
 		firstTicket2.setDescription("Second ticket description");
 		firstTicket2.setCreated(new Date());
-
+		
 		ticketsMap.put(firstVersion, Arrays.asList(firstTicket1, firstTicket2));
 		return ticketsMap;
 	}

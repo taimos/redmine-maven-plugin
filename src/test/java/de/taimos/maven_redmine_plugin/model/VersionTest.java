@@ -6,8 +6,6 @@ package de.taimos.maven_redmine_plugin.model;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.taimos.maven_redmine_plugin.model.Version;
-
 /**
  * Copyright 2013 Hoegernet<br>
  * <br>

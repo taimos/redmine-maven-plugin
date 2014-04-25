@@ -11,6 +11,27 @@ package de.taimos.maven_redmine_plugin;
  * and limitations under the License. #L%
  */
 
+import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
+
 import de.taimos.maven_redmine_plugin.model.Ticket;
 import de.taimos.maven_redmine_plugin.model.Version;
 import freemarker.ext.beans.BeansWrapper;
@@ -18,30 +39,23 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
-
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * 
  */
 public abstract class AbstractChangelogMojo extends RedmineMojo {
-
+	
 	/**
 	 * Changelog templates
 	 */
 	@Parameter(defaultValue = "", property = "changelogTemplate", required = false)
 	private String changelogTemplate;
 	
+	
 	@Override
 	protected void doExecute() throws MojoExecutionException {
 		this.prepareExecute();
-
+		
 		final List<Version> versions = this.redmine.getVersions(this.getProjectIdentifier());
 		
 		// Sort versions
@@ -49,55 +63,55 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 		// Newest first
 		Collections.reverse(versions);
 		// Build input stream
-		final InputStream stream = getInputStream(versions);
-
+		final InputStream stream = this.getInputStream(versions);
+		
 		try {
 			this.doChangelog(stream);
 		} finally {
 			IOUtil.close(stream);
 		}
 	}
-
+	
 	private InputStream getInputStream(final List<Version> versions) throws MojoExecutionException {
-		Map<Version, List<Ticket>> ticketsMap = buildTicketsMap(versions);
-		String template = getChangelogTemplate();
+		Map<Version, List<Ticket>> ticketsMap = this.buildTicketsMap(versions);
+		String template = this.getChangelogTemplate();
 		try {
 			FileReader reader = new FileReader(template);
-			return template.isEmpty() ? buildBasicString(ticketsMap) : buildTemplate(ticketsMap, template, reader);
+			return template.isEmpty() ? this.buildBasicString(ticketsMap) : this.buildTemplate(ticketsMap, template, reader);
 		} catch (FileNotFoundException e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
 	}
-
+	
 	private Map<Version, List<Ticket>> buildTicketsMap(final List<Version> versions) throws MojoExecutionException {
 		final Map<Version, List<Ticket>> ticketsMap = new LinkedHashMap<>();
-
+		
 		for (Version v : versions) {
 			if (this.includeVersion(v)) {
 				List<Ticket> tickets = this.redmine.getClosedTickets(this.getProjectIdentifier(), v.getId());
 				if (!tickets.isEmpty()) {
 					Collections.sort(tickets);
 				}
-
+				
 				ticketsMap.put(v, tickets);
 			}
 		}
-
+		
 		return ticketsMap;
 	}
-
+	
 	protected InputStream buildTemplate(final Map<Version, List<Ticket>> ticketsMap, final String templateName, final Reader reader) throws MojoExecutionException {
 		Configuration cfg = new Configuration();
-
+		
 		cfg.setDefaultEncoding("UTF-8");
 		cfg.setLocale(Locale.US);
 		cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 		BeansWrapper wrapper = new BeansWrapper();
 		wrapper.setSimpleMapWrapper(true);
 		cfg.setObjectWrapper(wrapper);
-
-		Map<Object, Object> model = buildModel(ticketsMap);
-
+		
+		Map<Object, Object> model = this.buildModel(ticketsMap);
+		
 		try {
 			Template template = new Template(templateName, reader, cfg);
 			StringWriter writer = new StringWriter();
@@ -107,32 +121,32 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
 	}
-
+	
 	private Map<Object, Object> buildModel(final Map<Version, List<Ticket>> ticketsMap) {
 		Map<Object, Object> model = new HashMap<>();
 		model.put("versions", ticketsMap.keySet());
-
+		
 		// freemarker can't work with non string keys
 		Map<String, List<Ticket>> stringKeyMap = new HashMap<>();
 		for (Version version : ticketsMap.keySet()) {
 			stringKeyMap.put(version.toString(), ticketsMap.get(version));
 		}
 		model.put("tickets", stringKeyMap);
-
+		
 		return model;
 	}
-
+	
 	private InputStream buildBasicString(final Map<Version, List<Ticket>> ticketsMap) throws MojoExecutionException {
 		final Set<Version> versions = ticketsMap.keySet();
 		final StringBuilder changelogText = new StringBuilder();
 		final SimpleDateFormat sdf = new SimpleDateFormat(this.getDateFormat(), Locale.US);
-
+		
 		for (Version v : versions) {
 			if (this.includeVersion(v)) {
 				String date = sdf.format(v.getUpdated_on());
 				changelogText.append(this.getVersionHeader(v.toVersionString(), date));
 				List<Ticket> tickets = ticketsMap.get(v);
-
+				
 				if (tickets.isEmpty()) {
 					this.getLog().warn("No tickets found for version: " + v.toVersionString());
 					String empty = this.getEmptyVersionString();
@@ -149,10 +163,10 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 				}
 			}
 		}
-
+		
 		return new ByteArrayInputStream(changelogText.toString().getBytes());
 	}
-
+	
 	protected abstract String getEmptyVersionString();
 	
 	protected abstract void doChangelog(final InputStream changelog) throws MojoExecutionException;
@@ -172,8 +186,8 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 	protected void prepareExecute() throws MojoExecutionException {
 		//
 	}
-
+	
 	protected String getChangelogTemplate() {
-		return StringUtils.isNotEmpty(changelogTemplate) ? changelogTemplate : null;
+		return StringUtils.isNotEmpty(this.changelogTemplate) ? this.changelogTemplate : null;
 	}
 }

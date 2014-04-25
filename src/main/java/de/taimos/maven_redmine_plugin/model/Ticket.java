@@ -13,7 +13,7 @@ package de.taimos.maven_redmine_plugin.model;
 
 import java.util.Date;
 
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * @author thoeger

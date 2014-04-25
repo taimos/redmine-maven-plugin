@@ -21,8 +21,9 @@ import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.maven.plugin.logging.Log;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.taimos.httputils.HTTPRequest;
 import de.taimos.httputils.WS;
@@ -62,7 +63,7 @@ public class Redmine {
 		this.log = log;
 		
 		this.mapper = new ObjectMapper();
-		this.mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
+		this.mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 	}
 	
 	/**
