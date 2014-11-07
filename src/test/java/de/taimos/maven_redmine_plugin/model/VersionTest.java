@@ -24,6 +24,7 @@ public class VersionTest {
 		Assert.assertEquals(-1, Version.compareVersions("1.0.1", "1.1.0"));
 		Assert.assertEquals(0, Version.compareVersions("1.1.0", "1.1"));
 		Assert.assertEquals(1, Version.compareVersions("1.2", "1.1.2"));
+		Assert.assertEquals(1, Version.compareVersions("1.2", "demo"));
 	}
 	
 	@Test

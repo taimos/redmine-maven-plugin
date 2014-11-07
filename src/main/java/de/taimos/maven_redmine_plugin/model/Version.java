@@ -201,6 +201,9 @@ public class Version implements Comparable<Version> {
 	}
 	
 	private static int[] splitVersion(final String version) {
+		if (!version.matches("\\d+(\\.\\d){0,2}")) {
+			return new int[3];
+		}
 		final String[] split = version.split("\\.");
 		if (split.length > 3) {
 			throw new RedmineException("Illegal version name");
