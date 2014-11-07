@@ -75,9 +75,12 @@ public abstract class AbstractChangelogMojo extends RedmineMojo {
 	private InputStream getInputStream(final List<Version> versions) throws MojoExecutionException {
 		Map<Version, List<Ticket>> ticketsMap = this.buildTicketsMap(versions);
 		String template = this.getChangelogTemplate();
+		if ((template == null) || template.isEmpty()) {
+			return this.buildBasicString(ticketsMap);
+		}
 		try {
 			FileReader reader = new FileReader(template);
-			return template.isEmpty() ? this.buildBasicString(ticketsMap) : this.buildTemplate(ticketsMap, template, reader);
+			return this.buildTemplate(ticketsMap, template, reader);
 		} catch (FileNotFoundException e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
