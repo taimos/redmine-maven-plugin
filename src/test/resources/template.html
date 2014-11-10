@@ -6,7 +6,7 @@
     ${version}
     <#assign tickets = tickets[version]/>
         <#list tickets as ticket>
-            #${ticket.id} - ${ticket.subject}
+            #${ticket.id?c} - ${ticket.subject}
         </#list>
 </#list>
 
